@@ -43,7 +43,8 @@ public class DepotController {
 
   @Operation(summary = "Get Depot by ID")
   @GetMapping("/{depotId}")
-  public ResponseEntity<ApiResponse<DepotResult>> getDepotById(@PathVariable("depotId") String depotId) {
+  public ResponseEntity<ApiResponse<DepotResult>> getDepotById(
+      @PathVariable("depotId") String depotId) {
     GetDepotByIdQuery query = new GetDepotByIdQuery(new DepotId(depotId));
     DepotResult result = queryBus.dispatch(query);
     return ResponseEntity.ok(ApiResponse.ok(result, "Depot retrieved successfully"));
