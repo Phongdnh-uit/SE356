@@ -4,12 +4,10 @@ import com.uit.se356.common.dto.Command;
 import com.uit.se356.common.dto.FieldError;
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
-import com.uit.se356.common.utils.ValidationUtil;
 import com.uit.se356.core.application.authentication.result.mfa.CompleteSetupMfaResult;
 import com.uit.se356.core.domain.vo.authentication.MfaMethod;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public record CompleteSetupMfaCommand(
     MfaMethod method,

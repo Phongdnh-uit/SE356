@@ -1,6 +1,7 @@
 package com.uit.se356.common.utils;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import java.util.Collections;
 import java.util.Map;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -35,7 +36,7 @@ public class ValidationUtil {
       ObjectMapper objectMapper = new ObjectMapper();
       return objectMapper.readValue(credentialJson, new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
-      return null;
+      return Collections.emptyMap();
     }
   }
 }
