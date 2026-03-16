@@ -76,7 +76,7 @@ public class WebAuthMfaProvider implements MfaProvider {
   private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
   private final ObjectConverter objectConverter = new ObjectConverter();
   private final UserRepository userRepository;
-    private final SecureRandom secureRandom = new SecureRandom();
+  private final SecureRandom secureRandom = new SecureRandom();
 
   @Override
   public boolean supports(MfaMethod method) {
