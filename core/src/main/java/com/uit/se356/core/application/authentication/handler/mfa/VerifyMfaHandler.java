@@ -80,6 +80,7 @@ public class VerifyMfaHandler implements CommandHandler<VerifyMfaCommand, LoginR
       mfaRepository.update(mfaOpt.get());
     }
 
+    // Xóa cache sau khi xác thực thành công
     authCacheRepository.delete(cacheKey);
 
     User user =

@@ -1,6 +1,9 @@
 package com.uit.se356.common.utils;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import java.util.Map;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 public class ValidationUtil {
   private static final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
@@ -22,6 +25,15 @@ public class ValidationUtil {
     try {
       var numberProto = phoneUtil.parse(phoneNumber, regionCode);
       return phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.E164);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public static Map<String, Object> parseCredentialJson(String credentialJson) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      return objectMapper.readValue(credentialJson, new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
       return null;
     }

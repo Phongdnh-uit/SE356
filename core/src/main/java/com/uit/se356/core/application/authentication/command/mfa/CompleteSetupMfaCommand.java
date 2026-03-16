@@ -4,6 +4,7 @@ import com.uit.se356.common.dto.Command;
 import com.uit.se356.common.dto.FieldError;
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
+import com.uit.se356.common.utils.ValidationUtil;
 import com.uit.se356.core.application.authentication.result.mfa.CompleteSetupMfaResult;
 import com.uit.se356.core.domain.vo.authentication.MfaMethod;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.Map;
 
 public record CompleteSetupMfaCommand(
     MfaMethod method,
-    String credential, // Dùng cho TOTP và email
-    Map<String, String> properties // Dùng cho webauth
+    String credential // Dùng cho TOTP và email, với webauth sẽ là credentialJson gửi theo format
+    // string
     ) implements Command<CompleteSetupMfaResult> {
   public CompleteSetupMfaCommand {
     List<FieldError> errors = new ArrayList<>();
@@ -33,18 +34,21 @@ public record CompleteSetupMfaCommand(
               new Object[] {"credential"}));
     }
 
-    if (method == MfaMethod.WEBAUTHN) {
-      // WebAuthn yêu cầu properties phải có "publicKey" và "attestationObject"
-      if (properties == null
-          || !properties.containsKey("publicKey")
-          || !properties.containsKey("attestationObject")) {
-        errors.add(
-            new FieldError(
-                "properties",
-                CommonErrorCode.FIELD_REQUIRED.getMessageKey(),
-                new Object[] {"properties with publicKey and attestationObject"}));
-      }
-    }
+    // if (method == MfaMethod.WEBAUTHN) {
+    //   // WebAuthn yêu cầu properties phải có "publicKey" và "attestationObject"
+    //   // Đánh đổi dùng ValidationUtil để parse credentialJson và kiểm tra thay vì tạo một class
+    //   // riêng cho WebAuthnCredential
+    //   Map<String, Object> properties = ValidationUtil.parseCredentialJson(credential);
+    //   if (properties == null
+    //       || !properties.containsKey("publicKey")
+    //       || !properties.containsKey("attestationObject")) {
+    //     errors.add(
+    //         new FieldError(
+    //             "properties",
+    //             CommonErrorCode.FIELD_REQUIRED.getMessageKey(),
+    //             new Object[] {"properties with publicKey and attestationObject"}));
+    //   }
+    // }
     if (!errors.isEmpty()) {
       throw new AppException(CommonErrorCode.VALIDATION_ERROR, errors);
     }

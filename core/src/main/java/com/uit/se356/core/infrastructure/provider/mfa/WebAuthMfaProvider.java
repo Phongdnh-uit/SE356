@@ -7,8 +7,12 @@ import com.uit.se356.core.application.authentication.port.out.MfaRepository;
 import com.uit.se356.core.application.authentication.result.mfa.MfaChallengeResult;
 import com.uit.se356.core.application.authentication.result.mfa.MfaSetupResult;
 import com.uit.se356.core.application.authentication.result.mfa.MfaVerifyResult;
+import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.domain.constants.SystemConstant;
 import com.uit.se356.core.domain.entities.authentication.Mfa;
+import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
+import com.uit.se356.core.domain.exception.UserErrorCode;
 import com.uit.se356.core.domain.vo.authentication.MfaMethod;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import com.uit.se356.core.domain.vo.authentication.mfa.MfaConfig;
@@ -23,6 +27,7 @@ import com.webauthn4j.data.AuthenticationData;
 import com.webauthn4j.data.AuthenticationParameters;
 import com.webauthn4j.data.AuthenticatorAttachment;
 import com.webauthn4j.data.AuthenticatorSelectionCriteria;
+import com.webauthn4j.data.AuthenticatorTransport;
 import com.webauthn4j.data.PublicKeyCredentialCreationOptions;
 import com.webauthn4j.data.PublicKeyCredentialDescriptor;
 import com.webauthn4j.data.PublicKeyCredentialHints;
@@ -42,7 +47,10 @@ import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.data.client.challenge.Challenge;
 import com.webauthn4j.data.client.challenge.DefaultChallenge;
 import com.webauthn4j.server.ServerProperty;
+import com.webauthn4j.verifier.exception.UserNotVerifiedException;
 import com.webauthn4j.verifier.exception.VerificationException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -50,6 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -65,6 +75,7 @@ public class WebAuthMfaProvider implements MfaProvider {
   private final AppProperties appProperties;
   private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
   private final ObjectConverter objectConverter = new ObjectConverter();
+  private final UserRepository userRepository;
 
   @Override
   public boolean supports(MfaMethod method) {
@@ -73,14 +84,20 @@ public class WebAuthMfaProvider implements MfaProvider {
 
   @Override
   public MfaSetupResult<WebAuthMfaConfig> initiateMfaSetup(UserId userId) {
-    PublicKeyCredentialRpEntity rp = new PublicKeyCredentialRpEntity("FlashMile");
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+    PublicKeyCredentialRpEntity rp =
+        new PublicKeyCredentialRpEntity(
+            getRpIdFromOrigin(appProperties.getFrontend().getBaseUrl()), SystemConstant.APP_NAME);
     byte[] challengeValue = generateRandomChallenge();
     Challenge challenge = new DefaultChallenge(challengeValue);
-    PublicKeyCredentialUserEntity user =
+    PublicKeyCredentialUserEntity userEntity =
         new PublicKeyCredentialUserEntity(
             userId.value().toString().getBytes(StandardCharsets.UTF_8),
-            userId.value().toString(),
-            userId.value().toString());
+            user.getFullName(),
+            user.getFullName());
 
     List<PublicKeyCredentialParameters> pubKeyCredParams =
         List.of(
@@ -91,14 +108,14 @@ public class WebAuthMfaProvider implements MfaProvider {
 
     AuthenticatorSelectionCriteria authenticatorSelection =
         new AuthenticatorSelectionCriteria(
-            AuthenticatorAttachment.PLATFORM, false, UserVerificationRequirement.PREFERRED);
+            AuthenticatorAttachment.PLATFORM, false, UserVerificationRequirement.REQUIRED);
 
     List<PublicKeyCredentialHints> hints = List.of(PublicKeyCredentialHints.CLIENT_DEVICE);
 
     PublicKeyCredentialCreationOptions options =
         new PublicKeyCredentialCreationOptions(
             rp,
-            user,
+            userEntity,
             challenge,
             pubKeyCredParams,
             60000L, // Timeout in milliseconds (1 minute)
@@ -116,7 +133,9 @@ public class WebAuthMfaProvider implements MfaProvider {
             new byte[0], // credentialId chưa có
             new byte[0], // publicKey chưa có
             0, // signCount chưa có
-            List.of() // Transport chưa có
+            List.of(), // Transport chưa có
+            false, // backupEligible mặc định false
+            false // backupState mặc định false
             );
     Map<String, String> metadata = new HashMap<>();
     metadata.put("publicKeyCredentialCreationOptions", objectMapper.writeValueAsString(options));
@@ -145,7 +164,11 @@ public class WebAuthMfaProvider implements MfaProvider {
     // 3. Chuyển đổi danh sách config từ DB thành danh sách "cho phép" (AllowCredentials)
     PublicKeyCredentialDescriptor allowCredential =
         new PublicKeyCredentialDescriptor(
-            PublicKeyCredentialType.PUBLIC_KEY, config.credentialId(), null);
+            PublicKeyCredentialType.PUBLIC_KEY,
+            config.credentialId(),
+            config.transports().stream()
+                .map(v -> AuthenticatorTransport.create(v))
+                .collect(Collectors.toSet()));
 
     // 4. Tạo Options để gửi về Frontend (PublicKeyCredentialRequestOptions)
     // rpId phải khớp với rpId lúc đăng ký (ví dụ: "flashmile.com")
@@ -153,9 +176,10 @@ public class WebAuthMfaProvider implements MfaProvider {
         new PublicKeyCredentialRequestOptions(
             challenge,
             60000L, // Timeout 1 phút
-            "FlashMile", // rpId
+            getRpIdFromOrigin(appProperties.getFrontend().getBaseUrl()), // rpId
             List.of(allowCredential), // allowCredentials
             UserVerificationRequirement.REQUIRED, // Ưu tiên quét vân tay/FaceID
+            List.of(), // hints
             null);
 
     // 5. CẬP NHẬT DB: Lưu challenge mới này vào bản ghi của User
@@ -166,7 +190,9 @@ public class WebAuthMfaProvider implements MfaProvider {
             config.credentialId(),
             config.publicKeyCos(),
             config.signCount(),
-            config.transports());
+            config.transports(),
+            config.backupEligible(),
+            config.backupState());
     mfaOpt.get().updateConfig(updatedConfig);
     mfaRepository.update(mfaOpt.get());
 
@@ -181,7 +207,7 @@ public class WebAuthMfaProvider implements MfaProvider {
     // ServerProperty theo đúng đặc tả RP ID và Origin của FlashMile
     ServerProperty serverProperty =
         ServerProperty.builder()
-            .rpId("FlashMile")
+            .rpId(getRpIdFromOrigin(appProperties.getFrontend().getBaseUrl()))
             .challenge(storedChallenge)
             .origin(new Origin(appProperties.getFrontend().getBaseUrl()))
             .build();
@@ -219,33 +245,52 @@ public class WebAuthMfaProvider implements MfaProvider {
     try {
       // Sử dụng RegistrationParameters mới
       RegistrationParameters registrationParameters =
-          new RegistrationParameters(serverProperty, null, true, true);
+          new RegistrationParameters(
+              serverProperty,
+              null,
+              false,
+              true); // Đặt userVerificationRequired=true để ưu tiên quét vân tay/FaceID, nếu thiết
+      // bị hỗ trợ UV
 
       // Verify bằng manager
       RegistrationData validatedData =
           webAuthnManager.verify(registrationData, registrationParameters);
+
+      // boolean isUserVerified =
+      //     validatedData.getAttestationObject().getAuthenticatorData().isFlagUV();
+      // log.info("User verification result during registration: {}", isUserVerified);
 
       // Trích xuất thông tin để cập nhật vào bản ghi config (sau đó bạn cần save bản ghi này vào
       // DB)
       var authData = validatedData.getAttestationObject().getAuthenticatorData();
       var credentialData = authData.getAttestedCredentialData();
 
-      // Cập nhật lại Object để lớp gọi hàm này có thể lấy data lưu vào DB
-      // Giả sử bạn cập nhật vào chính đối tượng config
+      // Lấy transport
+      Set<AuthenticatorTransport> transports = registrationData.getTransports();
+      List<String> transportList =
+          (transports != null)
+              ? transports.stream().map(AuthenticatorTransport::getValue).toList()
+              : List.of(); // Trả về mảng rỗng thay vì null để tránh lỗi Frontend
 
-      // config.setCredentialId(credentialData.getCredentialId());
-      // config.setPublicKeyCos(credentialData.getCOSEKey().getEncoded());
+      boolean isBackupEligible = authData.isFlagBE();
+      boolean isBackupState = authData.isFlagBS();
+
+      // Cập nhật lại Object để lớp gọi hàm này có thể lấy data lưu vào DB
       WebAuthMfaConfig updatedConfig =
           new WebAuthMfaConfig(
               config.challenge(),
               credentialData.getCredentialId(),
-              credentialData.getCOSEKey().getPublicKey().getEncoded(),
+              objectConverter.getCborMapper().writeValueAsBytes(credentialData.getCOSEKey()),
               0, // signCount ban đầu là 0
-              List.of() // Transport chưa có
-              );
+              transportList,
+              isBackupEligible,
+              isBackupState);
 
       return new MfaVerifyResult(true, updatedConfig);
     } catch (VerificationException e) {
+      if (e instanceof UserNotVerifiedException) {
+        throw new AppException(AuthErrorCode.MFA_USER_NOT_VERIFIED);
+      }
       return new MfaVerifyResult(false, null);
     }
   }
@@ -269,8 +314,10 @@ public class WebAuthMfaProvider implements MfaProvider {
           new CredentialRecordImpl(
               null, // attestationStatement
               true, // uvInitialized: true vì mình dùng TouchID/FaceID
-              false, // backupEligible: mặc định false nếu không dùng Passkey đồng bộ
-              false, // backupState: mặc định false
+              webAuthConfig
+                  .backupEligible(), // backupEligible: mặc định false nếu không dùng Passkey đồng
+              // bộ
+              webAuthConfig.backupState(), // backupState: mặc định false
               webAuthConfig.signCount(), // counter (đây chính là signCount)
               attestedCredentialData, // attestedCredentialData (Must not be null)
               null, // authenticatorExtensions
@@ -302,11 +349,29 @@ public class WebAuthMfaProvider implements MfaProvider {
               webAuthConfig.credentialId(),
               webAuthConfig.publicKeyCos(),
               newSignCount, // Cập nhật signCount mới
-              webAuthConfig.transports());
+              webAuthConfig.transports(),
+              webAuthConfig.backupEligible(),
+              webAuthConfig.backupState());
       return new MfaVerifyResult(true, updatedConfig);
     } catch (VerificationException e) {
       log.error("Authentication verification failed", e);
       return new MfaVerifyResult(false, null);
+    }
+  }
+
+  private String getRpIdFromOrigin(String origin) {
+    // Ví dụ: Nếu origin là "https://flashmile.com/", thì rpId sẽ là "flashmile.com"
+    // Bạn có thể cần xử lý thêm nếu origin có subdomain hoặc port
+    try {
+      URI uri = new URI(origin);
+      String host = uri.getHost();
+      if (host.startsWith("www.")) {
+        host = host.substring(4); // Loại bỏ "www." nếu có
+      }
+      return host;
+    } catch (URISyntaxException e) {
+      log.error("Invalid origin URI: {}", origin, e);
+      throw new AppException(CommonErrorCode.INTERNAL_ERROR);
     }
   }
 }

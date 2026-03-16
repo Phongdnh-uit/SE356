@@ -79,6 +79,9 @@ public class ChallengeMfaHandler
     authCacheRepository.setObject(
         key, cacheData, Duration.ofSeconds(authConfigPort.getMfaChallengeExpiration()));
 
+    // Xóa cache pre-challenge vì đã chuyển sang bước challenge
+    authCacheRepository.delete(String.format(CacheKey.MFA_PRECHALLENGE_PREFIX, command.verificationToken()));
+
     return result;
   }
 }

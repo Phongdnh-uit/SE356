@@ -7,5 +7,7 @@ public record WebAuthMfaConfig(
     byte[] credentialId,
     byte[] publicKeyCos,
     long signCount,
-    List<String> transports)
+    List<String> transports,
+    boolean backupEligible,
+    boolean backupState)
     implements MfaConfig {}
