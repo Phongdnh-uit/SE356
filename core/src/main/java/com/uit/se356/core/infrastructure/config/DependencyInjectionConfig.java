@@ -80,6 +80,8 @@ import com.uit.se356.core.application.upload.strategies.upload.UploadPolicy;
 import com.uit.se356.core.application.user.handler.GetUserProfileHandler;
 import com.uit.se356.core.application.user.handler.UpdateUserProfileHandler;
 import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
+import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -493,5 +495,11 @@ public class DependencyInjectionConfig {
   @Bean
   QueryHandler<?, ?> getAllDepotsHandler(DepotRepository depotRepository) {
     return new GetAllDepotsHandler(depotRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> saveVehicleHandler(
+      VehicleRepository vehicleRepository, IdGenerator idGenerator) {
+    return new SaveVehicleHandler(vehicleRepository, idGenerator);
   }
 }
