@@ -34,7 +34,7 @@ public class CreateDepotHandler implements CommandHandler<CreateDepotCommand, De
     // BR: Kiểm tra khoảng cách tối thiểu với các kho hiện tại
     if (depotRepository.hasNearbyDepot(command.lat(), command.lng(), MIN_DISTANCE_KM, null)) {
       errors.add(
-          new FieldError("lat,lng", "error.depot.too_close", new Object[] {MIN_DISTANCE_KM}));
+          new FieldError(String.valueOf(MIN_DISTANCE_KM), "error.depot.too_close", new Object[] {MIN_DISTANCE_KM}));
     }
     if (!errors.isEmpty()) {
       throw new AppException(DepotErrorCode.DEPOT_TOO_CLOSE, MIN_DISTANCE_KM);
