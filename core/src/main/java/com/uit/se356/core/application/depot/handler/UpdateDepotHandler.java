@@ -31,7 +31,10 @@ public class UpdateDepotHandler implements CommandHandler<UpdateDepotCommand, De
     if (depotRepository.hasNearbyDepot(
         command.lat(), command.lng(), MIN_DISTANCE_KM, command.id())) {
       errors.add(
-          new FieldError(String.valueOf(MIN_DISTANCE_KM), "error.depot.too_close", new Object[] {MIN_DISTANCE_KM}));
+          new FieldError(
+              String.valueOf(MIN_DISTANCE_KM),
+              "error.depot.too_close",
+              new Object[] {MIN_DISTANCE_KM}));
     }
     if (!errors.isEmpty()) {
       throw new AppException(DepotErrorCode.DEPOT_TOO_CLOSE, MIN_DISTANCE_KM);
