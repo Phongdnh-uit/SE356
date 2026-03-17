@@ -60,6 +60,13 @@ import com.uit.se356.core.application.contact.handler.GetContactByPhoneHandler;
 import com.uit.se356.core.application.contact.handler.GetMyContactsHandler;
 import com.uit.se356.core.application.contact.handler.UpdateContactHandler;
 import com.uit.se356.core.application.contact.port.RecipientContactRepository;
+import com.uit.se356.core.application.depot.handler.CreateDepotHandler;
+import com.uit.se356.core.application.depot.handler.DeleteDepotHandler;
+import com.uit.se356.core.application.depot.handler.GetAllDepotsHandler;
+import com.uit.se356.core.application.depot.handler.GetDepotByIdHandler;
+import com.uit.se356.core.application.depot.handler.UpdateDepotHandler;
+import com.uit.se356.core.application.depot.port.DepotRepository;
+import com.uit.se356.core.application.depot.port.RouteCheckingPort;
 import com.uit.se356.core.application.internal.handler.DebugOtpHandler;
 import com.uit.se356.core.application.internal.handler.SyncPermissionHandler;
 import com.uit.se356.core.application.upload.handler.ConfirmUploadCommandHandler;
@@ -459,5 +466,32 @@ public class DependencyInjectionConfig {
       MfaRepository mfaRepository,
       MfaBackupCodeRepository mfaBackupCodeRepository) {
     return new RemoveMfaMethodHandler(mfaRepository, securityUtil, mfaBackupCodeRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createDepotHandler(
+      DepotRepository depotRepository, IdGenerator idGenerator) {
+    return new CreateDepotHandler(depotRepository, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> updateDepotHandler(DepotRepository depotRepository) {
+    return new UpdateDepotHandler(depotRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> deleteDepotHandler(
+      DepotRepository depotRepository, RouteCheckingPort routeCheckingPort) {
+    return new DeleteDepotHandler(depotRepository, routeCheckingPort);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getDepotByIdHandler(DepotRepository depotRepository) {
+    return new GetDepotByIdHandler(depotRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getAllDepotsHandler(DepotRepository depotRepository) {
+    return new GetAllDepotsHandler(depotRepository);
   }
 }
