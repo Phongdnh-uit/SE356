@@ -10,6 +10,7 @@ import com.uit.se356.common.exception.CommonErrorCode;
 import com.uit.se356.core.application.authentication.port.out.MfaProvider;
 import com.uit.se356.core.application.authentication.result.mfa.MfaChallengeResult;
 import com.uit.se356.core.application.authentication.result.mfa.MfaSetupResult;
+import com.uit.se356.core.application.authentication.result.mfa.MfaVerifyResult;
 import com.uit.se356.core.domain.vo.authentication.MfaMethod;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import com.uit.se356.core.domain.vo.authentication.mfa.MfaConfig;
@@ -57,7 +58,7 @@ public class TotpMfaProvider implements MfaProvider {
   }
 
   @Override
-  public boolean verify(MfaConfig config, String credential) {
+  public MfaVerifyResult verify(MfaConfig config, String credential) {
     if (!(config instanceof TotpMfaConfig)) {
       log.error(
           "Invalid MFA config type: expected TotpMfaConfig, got {}", config.getClass().getName());
@@ -66,10 +67,10 @@ public class TotpMfaProvider implements MfaProvider {
     TotpMfaConfig totpConfig = (TotpMfaConfig) config;
     try {
       int code = Integer.parseInt(credential);
-      return isValid(totpConfig.secretKey(), code);
+      return new MfaVerifyResult(isValid(totpConfig.secretKey(), code), null);
     } catch (NumberFormatException e) {
       log.warn("Invalid TOTP code format: {}", credential);
-      return false;
+      return new MfaVerifyResult(false, null);
     }
   }
 

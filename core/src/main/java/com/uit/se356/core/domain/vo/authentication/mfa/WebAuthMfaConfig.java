@@ -1,4 +1,13 @@
 package com.uit.se356.core.domain.vo.authentication.mfa;
 
-public record WebAuthMfaConfig(String credentialId, String publicKey, long signCount)
+import java.util.List;
+
+public record WebAuthMfaConfig(
+    byte[] challenge,
+    byte[] credentialId,
+    byte[] publicKeyCos,
+    long signCount,
+    List<String> transports,
+    boolean backupEligible,
+    boolean backupState)
     implements MfaConfig {}
