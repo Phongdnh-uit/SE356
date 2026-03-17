@@ -1,6 +1,7 @@
 package com.uit.se356.core.application.vehicle.handler;
 
 import com.uit.se356.common.exception.AppException;
+import com.uit.se356.common.security.HasPermission;
 import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.vehicle.command.SaveVehicleCommand;
@@ -8,7 +9,6 @@ import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.application.vehicle.result.VehicleResult;
 import com.uit.se356.core.domain.entities.vehicle.Vehicle;
 import com.uit.se356.core.domain.exception.VehicleErrorCode;
-import com.uit.se356.core.domain.vo.authentication.UserId;
 import com.uit.se356.core.domain.vo.vehicle.PhysicalCapacity;
 import com.uit.se356.core.domain.vo.vehicle.VehicleId;
 
@@ -23,8 +23,9 @@ public class SaveVehicleHandler implements CommandHandler<SaveVehicleCommand, Ve
   }
 
   @Override
+  @HasPermission("vehicle:save")
   public VehicleResult handle(SaveVehicleCommand command) {
-    boolean isUpdate = command.id() != null && !command.id().isBlank();
+    boolean isUpdate = command.id() != null && !command.id().value().isBlank();
 
     // 1. Validation BR(2): Check Unique License Plate
     if (isUpdate) {
@@ -38,7 +39,7 @@ public class SaveVehicleHandler implements CommandHandler<SaveVehicleCommand, Ve
     }
 
     // 2. Validation BR(3): Check Shipper Assignment Availability
-    if (command.shipperId() != null && !command.shipperId().isBlank()) {
+    if (command.shipperId() != null && !command.shipperId().value().isBlank()) {
       boolean isShipperBusy =
           isUpdate
               ? vehicleRepository.existsByShipperIdAndIdNot(command.shipperId(), command.id())
@@ -62,8 +63,7 @@ public class SaveVehicleHandler implements CommandHandler<SaveVehicleCommand, Ve
               .findById(command.id())
               .orElseThrow(() -> new AppException(VehicleErrorCode.VEHICLE_NOT_FOUND));
 
-      vehicle.update(
-          command.licensePlate(), command.type(), capacity, new UserId(command.shipperId()));
+      vehicle.update(command.licensePlate(), command.type(), capacity, command.shipperId());
     } else {
       String newId = idGenerator.generate().toString();
       vehicle =
@@ -72,7 +72,7 @@ public class SaveVehicleHandler implements CommandHandler<SaveVehicleCommand, Ve
               command.licensePlate(),
               command.type(),
               capacity,
-              new UserId(command.shipperId()));
+              command.shipperId());
     }
 
     Vehicle savedVehicle = vehicleRepository.save(vehicle);

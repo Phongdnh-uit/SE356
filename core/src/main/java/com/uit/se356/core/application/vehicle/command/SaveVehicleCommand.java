@@ -5,17 +5,19 @@ import com.uit.se356.common.dto.FieldError;
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
 import com.uit.se356.core.application.vehicle.result.VehicleResult;
+import com.uit.se356.core.domain.vo.authentication.UserId;
+import com.uit.se356.core.domain.vo.vehicle.VehicleId;
 import com.uit.se356.core.domain.vo.vehicle.VehicleType;
 import java.util.ArrayList;
 import java.util.List;
 
 public record SaveVehicleCommand(
-    String id, // Null nếu là Create, có giá trị nếu là Update
+    VehicleId id, // Null nếu là Create, có giá trị nếu là Update
     String licensePlate,
     VehicleType type,
     Double maxWeight,
     Double maxVolume,
-    String shipperId)
+    UserId shipperId)
     implements Command<VehicleResult> {
   public SaveVehicleCommand {
     List<FieldError> errors = new ArrayList<>();
