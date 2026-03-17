@@ -62,4 +62,9 @@ public class DepotRepositoryImpl implements DepotRepository {
     var page = repository.findBy(spec, q -> q.as(DepotSummaryProjection.class).page(pageable));
     return PageResponse.from(page);
   }
+
+  @Override
+  public boolean hasNearbyDepot(double lat, double lng, double radiusInKm, DepotId excludeDepotId) {
+    return repository.existsDepotWithinRadius(lat, lng, radiusInKm, excludeDepotId.value());
+  }
 }

@@ -6,7 +6,8 @@ public enum DepotErrorCode implements ErrorCode {
   DEPOT_NOT_FOUND("DEPOT_001", "error.depot.not_found", 404),
   DEPOT_IN_USE("DEPOT_002", "error.depot.in_use", 400), // Lỗi khi xóa kho đang có tuyến xe
   INVALID_COORDINATE("DEPOT_003", "error.depot.invalid_coordinate", 400),
-  INVALID_DEPOT_ID("DEPOT_004", "error.depot.invalid_id", 400);
+  INVALID_DEPOT_ID("DEPOT_004", "error.depot.invalid_id", 400),
+  DEPOT_TOO_CLOSE("DEPOT_004", "error.depot.too_close", 400);
 
   private final String code;
   private final String messageKey;

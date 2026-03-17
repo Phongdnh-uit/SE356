@@ -17,4 +17,6 @@ public interface DepotRepository {
   Optional<Depot> findById(DepotId id);
 
   PageResponse<DepotSummaryProjection> findAll(SearchPageable searchCriteria);
+
+  boolean hasNearbyDepot(double lat, double lng, double radiusInKm, DepotId excludeDepotId);
 }
