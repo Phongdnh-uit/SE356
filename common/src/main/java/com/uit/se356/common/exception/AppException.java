@@ -1,9 +1,13 @@
 package com.uit.se356.common.exception;
 
+import java.io.Serial;
 import lombok.Getter;
 
 @Getter
 public class AppException extends RuntimeException {
+
+  @Serial static final long serialVersionUID = 1L;
+
   private final ErrorCode errorCode;
   private final Object details;
 
