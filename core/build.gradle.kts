@@ -5,6 +5,7 @@ dependencies {
     val minioVersion = "8.6.0"
     val zxingVersion = "3.5.3"
     val googleAuthVersion = "1.5.0"   
+    var webAuthn4jVersion = "0.31.1.RELEASE"
 
     implementation(project(":common"))
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -28,6 +29,7 @@ dependencies {
     implementation ("com.google.zxing:core:$zxingVersion")
     implementation ("com.google.zxing:javase:$zxingVersion")
     implementation ("com.warrenstrange:googleauth:$googleAuthVersion")
+    implementation("com.webauthn4j:webauthn4j-core:$webAuthn4jVersion")
 
 	runtimeOnly("org.postgresql:postgresql")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

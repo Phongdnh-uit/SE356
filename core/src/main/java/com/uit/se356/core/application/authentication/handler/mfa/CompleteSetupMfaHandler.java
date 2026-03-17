@@ -12,10 +12,12 @@ import com.uit.se356.core.application.authentication.port.out.MfaProvider;
 import com.uit.se356.core.application.authentication.port.out.MfaRepository;
 import com.uit.se356.core.application.authentication.port.out.PasswordEncoder;
 import com.uit.se356.core.application.authentication.result.mfa.CompleteSetupMfaResult;
+import com.uit.se356.core.application.authentication.result.mfa.MfaVerifyResult;
 import com.uit.se356.core.domain.entities.authentication.Mfa;
 import com.uit.se356.core.domain.entities.authentication.MfaBackupCode;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
 import com.uit.se356.core.domain.vo.authentication.MfaBackupCodeId;
+import com.uit.se356.core.domain.vo.authentication.MfaMethod;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +64,12 @@ public class CompleteSetupMfaHandler
           if (mfa.isVerified()) {
             throw new AppException(AuthErrorCode.MFA_METHOD_ALREADY_EXISTS);
           }
-          // TODO: Chưa tính đến trường hợp dùng WebAuth
-          boolean isValid = provider.verify(mfa.getConfig(), command.credential());
-          if (!isValid) {
+          MfaVerifyResult result = provider.verify(mfa.getConfig(), command.credential());
+          if (!result.success()) {
             throw new AppException(AuthErrorCode.INVALID_CREDENTIALS);
+          }
+          if (command.method() == MfaMethod.WEBAUTHN) {
+            mfa.updateConfig(result.updatedConfig());
           }
           mfa.markAsVerified();
           mfaRepository.update(mfa);
@@ -73,9 +77,6 @@ public class CompleteSetupMfaHandler
         () -> {
           throw new AppException(AuthErrorCode.MFA_METHOD_NOT_FOUND);
         });
-
-    // TODO: Backup code, dùng chung backup code cho tất cả các phương thức MFA,  không cần phải
-    // tạo mới khi thêm phương thức MFA mới
 
     List<MfaBackupCode> backupCodes = mfaBackupCodeRepository.findByUserId(userId);
 
@@ -101,13 +102,11 @@ public class CompleteSetupMfaHandler
         backupCodesToSave.add(backupCode);
       }
       mfaBackupCodeRepository.saveAll(backupCodesToSave);
-      CompleteSetupMfaResult result = new CompleteSetupMfaResult(bkCode);
-      return result;
+
+      return new CompleteSetupMfaResult(bkCode);
     }
 
     // Trường hợp đã có, không trả về gì hết vì backup code đã lưu ở lần đầu tiên
-    CompleteSetupMfaResult result = new CompleteSetupMfaResult(List.of());
-
-    return result;
+    return new CompleteSetupMfaResult(List.of());
   }
 }

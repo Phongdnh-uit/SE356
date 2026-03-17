@@ -8,7 +8,8 @@ import com.uit.se356.core.application.authentication.result.LoginResult;
 import java.util.ArrayList;
 import java.util.List;
 
-public record VerifyMfaCommand(String challengeId, String code) implements Command<LoginResult> {
+public record VerifyMfaCommand(String challengeId, String credential)
+    implements Command<LoginResult> {
   public VerifyMfaCommand {
     List<FieldError> errors = new ArrayList<>();
     if (challengeId == null || challengeId.isBlank()) {
@@ -18,10 +19,12 @@ public record VerifyMfaCommand(String challengeId, String code) implements Comma
               CommonErrorCode.FIELD_REQUIRED.getMessageKey(),
               new Object[] {"challengeId"}));
     }
-    if (code == null || code.isBlank()) {
+    if (credential == null || credential.isBlank()) {
       errors.add(
           new FieldError(
-              "code", CommonErrorCode.FIELD_REQUIRED.getMessageKey(), new Object[] {"code"}));
+              "credential",
+              CommonErrorCode.FIELD_REQUIRED.getMessageKey(),
+              new Object[] {"credential"}));
     }
     if (!errors.isEmpty()) {
       throw new AppException(CommonErrorCode.VALIDATION_ERROR, errors);

@@ -79,12 +79,10 @@ public class RecoveryMfaHandler implements CommandHandler<RecoveryMfaCommand, Lo
     IssueTokenCommand issueTokenCommand = new IssueTokenCommand(user.getId(), user.getRoleId());
     TokenPairResult tokenPair = issueTokenService.issueToken(issueTokenCommand);
 
-    LoginResult loginResult =
-        new LoginResult(
-            tokenPair.accessToken(),
-            tokenPair.refreshToken(),
-            tokenPair.expiresIn(),
-            tokenPair.tokenType());
-    return loginResult;
+    return new LoginResult(
+        tokenPair.accessToken(),
+        tokenPair.refreshToken(),
+        tokenPair.expiresIn(),
+        tokenPair.tokenType());
   }
 }

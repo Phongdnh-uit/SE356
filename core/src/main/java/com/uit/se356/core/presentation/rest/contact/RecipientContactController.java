@@ -84,7 +84,7 @@ public class RecipientContactController {
   @Operation(summary = "Update an existing contact")
   @PutMapping("/{contactId}")
   public ResponseEntity<ApiResponse<ContactResult>> updateContact(
-      @PathVariable String contactId, @RequestBody UpdateContactRequest request) {
+      @PathVariable("contactId") String contactId, @RequestBody UpdateContactRequest request) {
 
     UserId currentUserId = getCurrentUserId();
 
