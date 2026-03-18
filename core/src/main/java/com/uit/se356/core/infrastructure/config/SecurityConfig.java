@@ -57,7 +57,7 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                     .permitAll()
-                    .requestMatchers(EndpointRequest.to("health", "info"))
+                    .requestMatchers(EndpointRequest.to("health", "info", "prometheus"))
                     .permitAll()
                     .requestMatchers(SecurityConstant.PUBLIC_URLS)
                     .permitAll()

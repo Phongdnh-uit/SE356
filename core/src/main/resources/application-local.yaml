@@ -75,6 +75,7 @@ application:
       refresh-expiration: 604800000 # 7 days
     encryption-salt: fixed-salt-change-me
     encryption-secret-key: mySuperSecretKeyForEncryptionMustBeLongEnough
+    monitoring-secret: myMonitoringSecret
   mail:
     from: "noreply@flashmile.local"
   frontend:

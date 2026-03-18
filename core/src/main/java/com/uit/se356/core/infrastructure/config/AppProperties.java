@@ -35,6 +35,7 @@ public class AppProperties {
     private Jwt jwt;
     private String encryptionSecretKey;
     private String encryptionSalt;
+    private String monitoringSecret;
   }
 
   @Getter
