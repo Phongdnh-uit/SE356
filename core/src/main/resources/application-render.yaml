@@ -79,7 +79,7 @@ management:
     web:
       exposure:
         # Chỉ expose những gì thực sự cần thiết
-        include: health, info
+        include: health, info, prometheus
       base-path: ${ACTUATOR_BASE_PATH:/actuator} # Thay đổi path mặc định (/actuator) để tăng tính bảo mật
   endpoint:
     health:
@@ -101,6 +101,7 @@ application:
       refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 ngày
     encryption-salt: ${ENCRYPTION_SALT}
     encryption-secret-key: ${ENCRYPTION_SECRET_KEY}
+    monitoring-secret: ${MONITORING_SECRET}
   mail:
     from: ${MAIL_FROM}
   frontend:
