@@ -26,7 +26,11 @@ public class SyncPermissionHandler implements CommandHandler<SyncPermissionComma
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission(value = "permission:sync", description = "Sync permissions from code annotations")
+  @HasPermission(
+      name = "Sync Permissions",
+      description = "Sync permissions from code annotations",
+      resource = "Internal",
+      action = "Sync")
   @Override
   public Void handle(SyncPermissionCommand command) {
     // Xóa tất cả quyền hiện có
@@ -45,7 +49,10 @@ public class SyncPermissionHandler implements CommandHandler<SyncPermissionComma
           Permission.create(
               new PermissionId(idGenerator.generate().toString()),
               permission.name(),
-              permission.description());
+              permission.description(),
+              permission.resource(),
+              permission.action(),
+              permission.condition());
       permissionRepository.create(perm);
     }
     return null;

@@ -2,6 +2,7 @@ package com.uit.se356.core.application.authentication.services;
 
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.utils.SecurityUtil;
+import com.uit.se356.core.application.authentication.dto.PermissionCheckerDTO;
 import com.uit.se356.core.application.authentication.port.in.PermissionChecker;
 import com.uit.se356.core.application.authentication.port.out.AuthCacheRepository;
 import com.uit.se356.core.application.authentication.port.out.PermissionRepository;
@@ -34,10 +35,8 @@ public class PermissionCheckerImpl implements PermissionChecker {
     this.roleRepository = roleRepository;
   }
 
-  // TODO: Cần tối ưu lại, hiện tại đang có khá nhiều bất cập và nhập nhằng giữa các repository, phụ
-  // thuộc chéo giữa các jpa entity
   @Override
-  public void checkCurrentUserHasPermission(String permission) {
+  public void checkCurrentUserHasPermission(PermissionCheckerDTO dto) {
     // Lấy vai trò hiện tại của người dùng từ UserPrincipal, role lưu trong UserPrincipal là roleId
     RoleId roleId =
         new RoleId(
@@ -62,13 +61,16 @@ public class PermissionCheckerImpl implements PermissionChecker {
     if (permissionList.isEmpty()) {
       var permissions = permissionRepository.findAllByRoleId(roleId);
       Set<String> permissionSet =
-          permissions.stream().map(p -> p.getCode()).collect(Collectors.toSet());
+          permissions.stream()
+              .map(p -> p.getResource() + ":" + p.getAction())
+              .collect(Collectors.toSet());
       cacheRepository.setSet(cacheKey, permissionSet, Duration.ofHours(1));
       permissionList = Optional.of(permissionSet);
     }
 
     // Kiểm tra nếu permission không tồn tại trong danh sách quyền hạn của vai trò, ném lỗi
-    if (permissionList.isPresent() && !permissionList.get().contains(permission)) {
+    if (permissionList.isPresent()
+        && !permissionList.get().contains(dto.resource() + ":" + dto.action())) {
       throw new AppException(AuthErrorCode.ACCESS_DENIED);
     }
   }

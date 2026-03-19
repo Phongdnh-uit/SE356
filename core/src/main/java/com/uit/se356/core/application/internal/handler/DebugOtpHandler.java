@@ -6,6 +6,7 @@ import com.uit.se356.core.application.authentication.port.out.AuthCacheRepositor
 import com.uit.se356.core.application.internal.query.DebugOtpQuery;
 import com.uit.se356.core.application.internal.result.DebugOtpResult;
 import com.uit.se356.core.domain.constants.CacheKey;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 
 public class DebugOtpHandler implements QueryHandler<DebugOtpQuery, DebugOtpResult> {
 
@@ -16,8 +17,10 @@ public class DebugOtpHandler implements QueryHandler<DebugOtpQuery, DebugOtpResu
   }
 
   @HasPermission(
-      value = "debug:otp:read",
-      description = "Permission to read OTP for debugging purposes")
+      name = "Get Debug OTP",
+      description = "Permission to read OTP for debugging purposes",
+      resource = PermissionConstant.Resource.INTERNAL,
+      action = PermissionConstant.Action.READ)
   @Override
   public DebugOtpResult handle(DebugOtpQuery query) {
     String cacheKey = CacheKey.PHONE_VERIFICATION_CODE_PREFIX + ":" + query.phoneNumber();
