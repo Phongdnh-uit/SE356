@@ -3,6 +3,7 @@ package com.uit.se356.core.presentation.rest.auth;
 import com.uit.se356.common.dto.ApiResponse;
 import com.uit.se356.common.dto.PageResponse;
 import com.uit.se356.common.dto.SearchPageable;
+import com.uit.se356.common.dto.SearchRequest;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.QueryBus;
 import com.uit.se356.core.application.authentication.command.permission.AssignPermissionCommand;
@@ -12,6 +13,7 @@ import com.uit.se356.core.application.authentication.command.role.UpdateRoleComm
 import com.uit.se356.core.application.authentication.projections.PermissionSummaryProjection;
 import com.uit.se356.core.application.authentication.projections.RoleSummaryProjection;
 import com.uit.se356.core.application.authentication.query.role.GetPermissionsByRoleQuery;
+import com.uit.se356.core.application.authentication.query.role.GetRoleByIdQuery;
 import com.uit.se356.core.application.authentication.query.role.RoleSummaryQuery;
 import com.uit.se356.core.application.authentication.result.RoleResult;
 import com.uit.se356.core.domain.vo.authentication.PermissionId;
@@ -19,6 +21,8 @@ import com.uit.se356.core.domain.vo.authentication.RoleId;
 import com.uit.se356.core.presentation.dto.role.AssignPermissionRequest;
 import com.uit.se356.core.presentation.dto.role.UpdateRoleRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -84,11 +88,20 @@ public class RoleController {
   }
 
   @GetMapping("/{id}/permissions")
-  public ResponseEntity<ApiResponse<PageResponse<PermissionSummaryProjection>>> getRolePermissions(
-      @PathVariable("id") String id, @ParameterObject @ModelAttribute SearchPageable pageable) {
+  public ResponseEntity<ApiResponse<Map<String, List<PermissionSummaryProjection>>>>
+      getRolePermissions(
+          @PathVariable("id") String id, @ParameterObject @ModelAttribute SearchRequest pageable) {
     return ResponseEntity.ok(
         ApiResponse.ok(
             queryBus.dispatch(new GetPermissionsByRoleQuery(new RoleId(id), pageable)),
             "Role permissions retrieved successfully"));
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<RoleResult>> getRoleById(@PathVariable("id") String id) {
+    return ResponseEntity.ok(
+        ApiResponse.ok(
+            queryBus.dispatch(new GetRoleByIdQuery(new RoleId(id))),
+            "Role retrieved successfully"));
   }
 }

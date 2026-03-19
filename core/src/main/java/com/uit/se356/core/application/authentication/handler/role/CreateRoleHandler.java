@@ -8,6 +8,7 @@ import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.authentication.command.role.CreateRoleCommand;
 import com.uit.se356.core.application.authentication.port.out.RoleRepository;
 import com.uit.se356.core.application.authentication.result.RoleResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.authentication.Role;
 import com.uit.se356.core.domain.vo.authentication.RoleId;
 import java.util.HashMap;
@@ -22,7 +23,11 @@ public class CreateRoleHandler implements CommandHandler<CreateRoleCommand, Role
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission("role:create")
+  @HasPermission(
+      name = "Create Role",
+      description = "Permission to create a new role",
+      resource = PermissionConstant.Resource.ROLE,
+      action = PermissionConstant.Action.CREATE)
   @Override
   public RoleResult handle(CreateRoleCommand command) {
     Map<String, Object> errors = new HashMap<>();

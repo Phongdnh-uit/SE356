@@ -55,6 +55,14 @@ public class Permission {
     return new Permission(id, name, description, resource, action, condition);
   }
 
+  // ============================ BEHAVIORS ============================
+  public void update(String name, String description, String condition) {
+    Objects.requireNonNull(name);
+    this.name = name;
+    this.description = description;
+    this.condition = condition;
+  }
+
   // ============================ GETTERS ============================
   public PermissionId getId() {
     return id;

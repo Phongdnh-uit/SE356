@@ -58,7 +58,7 @@ public class PermissionCheckerImpl implements PermissionChecker {
     Optional<Set<String>> permissionList = cacheRepository.getSet(cacheKey);
 
     // Nếu không có trong cache, truy vấn từ database và lưu vào cache lại
-    if (permissionList.isEmpty()) {
+    if (permissionList.isEmpty() || permissionList.get().isEmpty()) {
       var permissions = permissionRepository.findAllByRoleId(roleId);
       Set<String> permissionSet =
           permissions.stream()
