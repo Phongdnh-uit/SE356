@@ -6,6 +6,7 @@ import com.uit.se356.common.services.QueryHandler;
 import com.uit.se356.core.application.authentication.port.out.RoleRepository;
 import com.uit.se356.core.application.authentication.projections.RoleSummaryProjection;
 import com.uit.se356.core.application.authentication.query.role.RoleSummaryQuery;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 
 public class RoleSummaryQueryHandler
     implements QueryHandler<RoleSummaryQuery, PageResponse<RoleSummaryProjection>> {
@@ -16,7 +17,11 @@ public class RoleSummaryQueryHandler
     this.roleRepository = roleRepository;
   }
 
-  @HasPermission("role:read_summary")
+  @HasPermission(
+      name = "Read Role Summary",
+      description = "Permission to read role summary list",
+      resource = PermissionConstant.Resource.ROLE,
+      action = PermissionConstant.Action.READ_SUMMARY)
   @Override
   public PageResponse<RoleSummaryProjection> handle(RoleSummaryQuery query) {
     return roleRepository.findAll(query.pageable());

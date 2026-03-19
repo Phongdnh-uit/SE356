@@ -3,6 +3,7 @@ package com.uit.se356.core.infrastructure.config;
 import com.uit.se356.core.domain.constants.SecurityConstant;
 import com.uit.se356.core.domain.constants.SystemConstant;
 import com.uit.se356.core.infrastructure.security.CustomAuthEntryPoint;
+import com.uit.se356.core.infrastructure.security.filter.PrometheusSecurityFilter;
 import com.uit.se356.core.infrastructure.security.jwt.CustomJwtConverter;
 import com.uit.se356.core.infrastructure.security.oauth2.CustomOAuth2AuthRequestResolver;
 import com.uit.se356.core.infrastructure.security.oauth2.CustomOAuth2Service;
@@ -26,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
@@ -48,9 +50,11 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       CustomJwtConverter customJwtConverter,
-      CustomAuthEntryPoint customAuthEntryPoint)
+      CustomAuthEntryPoint customAuthEntryPoint,
+      PrometheusSecurityFilter prometheusSecurityFilter)
       throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable)
+    http.addFilterBefore(prometheusSecurityFilter, BearerTokenAuthenticationFilter.class)
+        .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(

@@ -8,7 +8,13 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HasPermission {
-  String value();
+  String description();
 
-  String description() default "";
+  String resource();
+
+  String name();
+
+  String action();
+
+  String condition() default "";
 }

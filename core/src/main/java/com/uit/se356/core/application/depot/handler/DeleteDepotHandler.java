@@ -6,6 +6,7 @@ import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.core.application.depot.command.DeleteDepotCommand;
 import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.port.RouteCheckingPort;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.depot.Depot;
 import com.uit.se356.core.domain.exception.DepotErrorCode;
 
@@ -18,8 +19,12 @@ public class DeleteDepotHandler implements CommandHandler<DeleteDepotCommand, Vo
     this.routeCheckingPort = routeCheckingPort;
   }
 
+  @HasPermission(
+      name = "Delete Depot",
+      description = "Permission to delete a depot",
+      resource = PermissionConstant.Resource.DEPOT,
+      action = PermissionConstant.Action.DELETE)
   @Override
-  @HasPermission("depot:delete")
   public Void handle(DeleteDepotCommand command) {
     Depot depot =
         depotRepository

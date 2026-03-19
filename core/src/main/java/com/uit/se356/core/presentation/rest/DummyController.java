@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DummyController {
   private final SecurityUtil<UserId> securityUtil;
 
-  @HasPermission(value = "dummy:read")
+  @HasPermission(
+      name = "Dummy Permission",
+      description = "Permission to access dummy endpoint",
+      resource = "Dummy",
+      action = "Access")
   @GetMapping("/dummy")
   public String getDummy() {
     UserId userId = securityUtil.getCurrentUserPrincipal().get().getId();

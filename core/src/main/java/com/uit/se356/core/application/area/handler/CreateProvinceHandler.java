@@ -7,6 +7,7 @@ import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.area.command.CreateProvinceCommand;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.result.ProvinceResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.area.Province;
 import com.uit.se356.core.domain.exception.AreaErrorCode;
 import com.uit.se356.core.domain.vo.area.ProvinceId;
@@ -21,7 +22,11 @@ public class CreateProvinceHandler
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission("province:create")
+  @HasPermission(
+      name = "Create Province",
+      description = "Permission to create a new province",
+      resource = PermissionConstant.Resource.PROVINCE,
+      action = PermissionConstant.Action.CREATE)
   @Override
   public ProvinceResult handle(CreateProvinceCommand command) {
     if (provinceRepository.existsByCode(command.code())) {
