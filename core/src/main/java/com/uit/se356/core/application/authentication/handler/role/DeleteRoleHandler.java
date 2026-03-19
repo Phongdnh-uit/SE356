@@ -6,6 +6,7 @@ import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.core.application.authentication.command.role.DeleteRoleCommand;
 import com.uit.se356.core.application.authentication.port.out.RoleRepository;
 import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.authentication.Role;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
@@ -22,7 +23,11 @@ public class DeleteRoleHandler implements CommandHandler<DeleteRoleCommand, Void
     this.userRepository = userRepository;
   }
 
-  @HasPermission("role:delete")
+  @HasPermission(
+      name = "Delete Role",
+      description = "Permission to delete a role",
+      resource = PermissionConstant.Resource.ROLE,
+      action = PermissionConstant.Action.DELETE)
   @Override
   public Void handle(DeleteRoleCommand command) {
     // 1. Kiểm tra xem vai trò có tồn tại không

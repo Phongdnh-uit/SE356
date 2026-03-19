@@ -13,8 +13,11 @@ public class PermissionPersistenceMapper {
     }
     PermissionJpaEntity entity = new PermissionJpaEntity();
     entity.setId(permission.getId().value());
-    entity.setCode(permission.getCode());
+    entity.setName(permission.getName());
     entity.setDescription(permission.getDescription());
+    entity.setResource(permission.getResource());
+    entity.setAction(permission.getAction());
+    entity.setCondition(permission.getCondition());
     return entity;
   }
 
@@ -24,7 +27,12 @@ public class PermissionPersistenceMapper {
     }
     Permission permission =
         Permission.rehydrate(
-            new PermissionId(entity.getId()), entity.getCode(), entity.getDescription());
+            new PermissionId(entity.getId()),
+            entity.getName(),
+            entity.getDescription(),
+            entity.getResource(),
+            entity.getAction(),
+            entity.getCondition());
     return permission;
   }
 
@@ -32,7 +40,10 @@ public class PermissionPersistenceMapper {
     if (permission == null || entity == null) {
       return;
     }
-    entity.setCode(permission.getCode());
+    entity.setName(permission.getName());
     entity.setDescription(permission.getDescription());
+    entity.setResource(permission.getResource());
+    entity.setAction(permission.getAction());
+    entity.setCondition(permission.getCondition());
   }
 }

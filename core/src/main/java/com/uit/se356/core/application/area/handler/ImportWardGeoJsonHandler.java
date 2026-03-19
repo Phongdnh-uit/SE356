@@ -11,6 +11,7 @@ import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.area.command.ImportWardGeoJsonCommand;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.port.WardRepository;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.area.Province;
 import com.uit.se356.core.domain.entities.area.Ward;
 import com.uit.se356.core.domain.vo.area.Polygon;
@@ -39,7 +40,11 @@ public class ImportWardGeoJsonHandler implements CommandHandler<ImportWardGeoJso
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission("ward:create")
+  @HasPermission(
+      name = "Import Ward GeoJSON",
+      description = "Permission to import wards from GeoJSON file",
+      resource = PermissionConstant.Resource.WARD,
+      action = PermissionConstant.Action.CREATE)
   @Override
   public Integer handle(ImportWardGeoJsonCommand command) {
     int count = 0;

@@ -2,7 +2,6 @@ package com.uit.se356.core.presentation.rest.user;
 
 import com.uit.se356.common.dto.ApiResponse;
 import com.uit.se356.common.exception.AppException;
-import com.uit.se356.common.security.HasPermission;
 import com.uit.se356.common.security.UserPrincipal;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.QueryBus;
@@ -30,7 +29,6 @@ public class UserController {
   private final SecurityUtil<UserId> securityUtil;
 
   @Operation(summary = "Get My Profile")
-  @HasPermission(value = "user:read", description = "Permission to read own profile information")
   @GetMapping("/me")
   public ResponseEntity<ApiResponse<UserProfileResult>> getMyProfile() {
     UserId currentUserId =

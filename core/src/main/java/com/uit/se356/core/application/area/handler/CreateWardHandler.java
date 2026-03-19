@@ -8,6 +8,7 @@ import com.uit.se356.core.application.area.command.CreateWardCommand;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.port.WardRepository;
 import com.uit.se356.core.application.area.result.WardResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.area.Ward;
 import com.uit.se356.core.domain.exception.AreaErrorCode;
 import com.uit.se356.core.domain.vo.area.WardId;
@@ -27,7 +28,11 @@ public class CreateWardHandler implements CommandHandler<CreateWardCommand, Ward
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission("ward:create")
+  @HasPermission(
+      name = "Create Ward",
+      description = "Permission to create a new ward",
+      resource = PermissionConstant.Resource.WARD,
+      action = PermissionConstant.Action.CREATE)
   @Override
   public WardResult handle(CreateWardCommand command) {
     if (wardRepository.existsByCode(command.code())) {

@@ -8,6 +8,7 @@ import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.depot.command.CreateDepotCommand;
 import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.result.DepotResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.depot.Depot;
 import com.uit.se356.core.domain.exception.DepotErrorCode;
 import com.uit.se356.core.domain.vo.area.Coordinate;
@@ -27,8 +28,12 @@ public class CreateDepotHandler implements CommandHandler<CreateDepotCommand, De
     this.idGenerator = idGenerator;
   }
 
+  @HasPermission(
+      name = "Create Depot",
+      description = "Permission to create a new depot",
+      resource = PermissionConstant.Resource.DEPOT,
+      action = PermissionConstant.Action.CREATE)
   @Override
-  @HasPermission("depot:create")
   public DepotResult handle(CreateDepotCommand command) {
     List<FieldError> errors = new ArrayList<>();
     // BR: Kiểm tra khoảng cách tối thiểu với các kho hiện tại
