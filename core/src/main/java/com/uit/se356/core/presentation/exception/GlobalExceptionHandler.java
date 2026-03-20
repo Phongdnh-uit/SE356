@@ -66,7 +66,14 @@ public class GlobalExceptionHandler {
             message.isBlank() ? ex.getMessage() : message,
             errors,
             ex.getErrorCode().getCode());
-    log.error("AppException: {}", errorResponse);
+
+    // Chỉ ghi log với các lỗi nghiêm trọng của server, còn các lỗi client (4xx) thì không cần log
+    // hoặc log ở mức độ thấp hơn
+    if (ex.getErrorCode().getHttpStatus() >= 500) {
+      log.error("CRITICAL ERROR: {}", errorResponse, ex);
+    } else {
+      log.warn("Bussiness Warning: {}", errorResponse);
+    }
     return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(errorResponse);
   }
 
@@ -92,7 +99,7 @@ public class GlobalExceptionHandler {
             message,
             fieldErrors,
             CommonErrorCode.VALIDATION_ERROR.getCode());
-    log.error("Validation Exception: {}", errorResponse);
+    log.warn("Bussiness Warning: {}", errorResponse);
     return ResponseEntity.status(CommonErrorCode.VALIDATION_ERROR.getHttpStatus())
         .body(errorResponse);
   }
@@ -110,7 +117,7 @@ public class GlobalExceptionHandler {
             message,
             null,
             CommonErrorCode.INTERNAL_ERROR.getCode());
-    log.error("Unexpected Exception: ", ex);
+    log.error("CRITICAL ERROR: {}", errorResponse, ex);
     return ResponseEntity.status(CommonErrorCode.INTERNAL_ERROR.getHttpStatus())
         .body(errorResponse);
   }
@@ -137,7 +144,7 @@ public class GlobalExceptionHandler {
             null,
             CommonErrorCode.VALIDATION_ERROR.getCode());
 
-    log.error("JSON Parse Error: {}", ex.getMessage());
+    log.warn("Bussiness Warning: {}", errorResponse, ex);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 }
