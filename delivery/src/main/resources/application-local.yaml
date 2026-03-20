@@ -1,0 +1,29 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: docker/local/compose.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      ack-mode: manual
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+      # properties:
+      # spring:
+      #   json:
+      #     trusted:
+      #       packages: "*"
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: java.util.HashMap
+        spring.json.use.type.headers: false
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

@@ -1,3 +1,3 @@
 rootProject.name = "SE356"
 
-include("core", "common")
+include("core", "common", "delivery")
