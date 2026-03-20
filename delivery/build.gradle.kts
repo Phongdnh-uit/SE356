@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":common"))
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
