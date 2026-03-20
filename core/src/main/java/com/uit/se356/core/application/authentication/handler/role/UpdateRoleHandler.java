@@ -7,6 +7,7 @@ import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.core.application.authentication.command.role.UpdateRoleCommand;
 import com.uit.se356.core.application.authentication.port.out.RoleRepository;
 import com.uit.se356.core.application.authentication.result.RoleResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.authentication.Role;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
 import com.uit.se356.core.domain.vo.authentication.RoleId;
@@ -21,7 +22,11 @@ public class UpdateRoleHandler implements CommandHandler<UpdateRoleCommand, Role
     this.roleRepository = roleRepository;
   }
 
-  @HasPermission("role:update")
+  @HasPermission(
+      name = "Update Role",
+      description = "Permission to update a role",
+      resource = PermissionConstant.Resource.ROLE,
+      action = PermissionConstant.Action.UPDATE)
   @Override
   public RoleResult handle(UpdateRoleCommand command) {
     // 1. Kiểm tra xem role có tồn tại không

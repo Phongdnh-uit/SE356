@@ -7,6 +7,7 @@ import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.area.command.ImportProvinceGeoJsonCommand;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.area.Province;
 import com.uit.se356.core.domain.vo.area.ProvinceId;
 import com.uit.se356.core.domain.vo.area.ProvinceType;
@@ -27,7 +28,11 @@ public class ImportProvinceGeoJsonHandler
     this.idGenerator = idGenerator;
   }
 
-  @HasPermission("province:create")
+  @HasPermission(
+      name = "Import Province GeoJSON",
+      description = "Permission to import provinces from GeoJSON file",
+      resource = PermissionConstant.Resource.PROVINCE,
+      action = PermissionConstant.Action.CREATE)
   @Override
   public Integer handle(ImportProvinceGeoJsonCommand command) {
     int count = 0;

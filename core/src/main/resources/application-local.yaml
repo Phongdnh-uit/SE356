@@ -13,6 +13,12 @@ spring:
     show-sql: true # Hiển thị câu lệnh SQL trong log để tối ưu khi cần
     properties:
       hibernate:
+        default_batch_fetch_size: 20 # Kích thước batch mặc định cho các truy vấn liên quan đến collection
+        order_updates: true # Tối ưu cập nhật bằng cách nhóm các câu lệnh UPDATE lại với nhau
+        order_inserts: true # Tối ưu chèn bằng cách nhóm các câu lệnh INSERT lại với nhau
+        jdbc:
+          batch_size: 50 # Kích thước batch cho các câu lệnh SQL
+          batch_versioned_data: true # Cho phép batch các câu lệnh UPDATE/DELETE có phiên bản
         format_sql: true # Định dạng câu lệnh SQL cho dễ đọc
 
   # Cấu hình tự động hỗ trợ docker khi chạy ứng dụng local
@@ -75,6 +81,7 @@ application:
       refresh-expiration: 604800000 # 7 days
     encryption-salt: fixed-salt-change-me
     encryption-secret-key: mySuperSecretKeyForEncryptionMustBeLongEnough
+    monitoring-secret: myMonitoringSecret
   mail:
     from: "noreply@flashmile.local"
   frontend:

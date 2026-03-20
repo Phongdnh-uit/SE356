@@ -5,26 +5,62 @@ import java.util.Objects;
 
 public class Permission {
   private final PermissionId id;
-  private String code;
+  private String name;
   private String description;
+  private String resource;
+  private String action;
+  private String condition;
 
-  private Permission(PermissionId id, String code, String description) {
+  private Permission(
+      PermissionId id,
+      String name,
+      String description,
+      String resource,
+      String action,
+      String condition) {
     this.id = id;
-    this.code = code;
+    this.name = name;
     this.description = description;
+    this.resource = resource;
+    this.action = action;
+    this.condition = condition;
   }
 
   // ============================ FACTORY ============================
-  public static Permission create(PermissionId id, String code, String description) {
+  public static Permission create(
+      PermissionId id,
+      String name,
+      String description,
+      String resource,
+      String action,
+      String condition) {
     Objects.requireNonNull(id);
-    Objects.requireNonNull(code);
-    return new Permission(id, code, description);
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(resource);
+    Objects.requireNonNull(action);
+    return new Permission(id, name, description, resource, action, condition);
   }
 
-  public static Permission rehydrate(PermissionId id, String code, String description) {
+  public static Permission rehydrate(
+      PermissionId id,
+      String name,
+      String description,
+      String resource,
+      String action,
+      String condition) {
     Objects.requireNonNull(id);
-    Objects.requireNonNull(code);
-    return new Permission(id, code, description);
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(resource);
+    Objects.requireNonNull(action);
+    return new Permission(id, name, description, resource, action, condition);
+  }
+
+  // ============================ BEHAVIORS ============================
+  public void update(String name, String description, String condition) {
+    Objects.requireNonNull(name);
+    this.name = name;
+    this.description = description;
+    this.condition = condition;
   }
 
   // ============================ GETTERS ============================
@@ -32,11 +68,23 @@ public class Permission {
     return id;
   }
 
-  public String getCode() {
-    return code;
+  public String getName() {
+    return name;
   }
 
   public String getDescription() {
     return description;
+  }
+
+  public String getResource() {
+    return resource;
+  }
+
+  public String getAction() {
+    return action;
+  }
+
+  public String getCondition() {
+    return condition;
   }
 }

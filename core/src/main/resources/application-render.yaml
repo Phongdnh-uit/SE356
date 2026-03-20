@@ -20,9 +20,12 @@ spring:
     show-sql: false # Tắt hiển thị câu lệnh SQL trong log để tránh lộ thông tin nhạy cảm
     properties:
       hibernate:
-        jdbc.batch_size: 30 # Tối ưu insert/update hàng loạt
-        order_inserts: true
-        order_updates: true
+        default_batch_fetch_size: 20 # Kích thước batch mặc định cho các truy vấn liên quan đến collection
+        order_updates: true # Tối ưu cập nhật bằng cách nhóm các câu lệnh UPDATE lại với nhau
+        order_inserts: true # Tối ưu chèn bằng cách nhóm các câu lệnh INSERT lại với nhau
+        jdbc:
+          batch_size: 50 # Kích thước batch cho các câu lệnh SQL
+          batch_versioned_data: true # Cho phép batch các câu lệnh UPDATE/DELETE có phiên bản
   flyway:
     clean-disabled: true # Vô hiệu hóa lệnh clean trong môi trường production
 
@@ -79,7 +82,7 @@ management:
     web:
       exposure:
         # Chỉ expose những gì thực sự cần thiết
-        include: health, info
+        include: health, info, prometheus
       base-path: ${ACTUATOR_BASE_PATH:/actuator} # Thay đổi path mặc định (/actuator) để tăng tính bảo mật
   endpoint:
     health:
@@ -101,6 +104,7 @@ application:
       refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 ngày
     encryption-salt: ${ENCRYPTION_SALT}
     encryption-secret-key: ${ENCRYPTION_SECRET_KEY}
+    monitoring-secret: ${MONITORING_SECRET}
   mail:
     from: ${MAIL_FROM}
   frontend:

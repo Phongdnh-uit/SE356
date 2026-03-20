@@ -1,7 +1,6 @@
 package com.uit.se356.core.infrastructure.repositories.authentication;
 
-import com.uit.se356.common.dto.PageResponse;
-import com.uit.se356.common.dto.SearchPageable;
+import com.uit.se356.common.dto.SearchRequest;
 import com.uit.se356.common.utils.PageableUtil;
 import com.uit.se356.core.application.authentication.port.out.PermissionRepository;
 import com.uit.se356.core.application.authentication.projections.PermissionSummaryProjection;
@@ -70,12 +69,6 @@ public class PermissionRepositoryImpl implements PermissionRepository {
   }
 
   @Override
-  @Transactional
-  public void deleteAll() {
-    permissionJpaRepository.deleteAll();
-  }
-
-  @Override
   public List<PermissionSummaryProjection> findAllByRoleId(RoleId roleId) {
     Specification<PermissionJpaEntity> spec =
         (root, query, builder) -> {
@@ -86,14 +79,14 @@ public class PermissionRepositoryImpl implements PermissionRepository {
   }
 
   @Override
-  public PageResponse<PermissionSummaryProjection> findAll(SearchPageable searchPageable) {
+  public List<PermissionSummaryProjection> findAll(SearchRequest searchPageable) {
     Specification<PermissionJpaEntity> spec =
         RSQLJPASupport.toSpecification(searchPageable.filter());
     Pageable pageable = PageableUtil.createPageable(searchPageable);
     var page =
         permissionJpaRepository.findBy(
             spec, q -> q.as(PermissionSummaryProjection.class).page(pageable));
-    return PageResponse.from(page);
+    return page.getContent();
   }
 
   @Override
@@ -105,18 +98,32 @@ public class PermissionRepositoryImpl implements PermissionRepository {
   }
 
   @Override
-  public PageResponse<PermissionSummaryProjection> findAllByRoleId(
-      RoleId roleId, SearchPageable searchPageable) {
+  public List<PermissionSummaryProjection> findAllByRoleId(
+      RoleId roleId, SearchRequest searchRequest) {
     Specification<PermissionJpaEntity> spec =
         (root, query, builder) -> {
           Join<PermissionJpaEntity, RoleJpaEntity> roleJoin = root.join("roles");
           return builder.equal(roleJoin.get("id"), roleId.value());
         };
-    spec = spec.and(RSQLJPASupport.toSpecification(searchPageable.filter()));
-    Pageable pageable = PageableUtil.createPageable(searchPageable);
+    spec = spec.and(RSQLJPASupport.toSpecification(searchRequest.filter()));
+    Pageable pageable = PageableUtil.createPageable(searchRequest);
     var page =
         permissionJpaRepository.findBy(
             spec, q -> q.as(PermissionSummaryProjection.class).page(pageable));
-    return PageResponse.from(page);
+    return page.getContent();
+  }
+
+  @Override
+  public void deleteAllById(Set<PermissionId> permissionIds) {
+    permissionJpaRepository.deleteAllById(
+        permissionIds.stream().map(PermissionId::value).collect(Collectors.toSet()));
+  }
+
+  @Override
+  public List<Permission> findAll() {
+    List<PermissionJpaEntity> entities = permissionJpaRepository.findAll();
+    return entities.stream()
+        .map(permissionPersistenceMapper::toDomain)
+        .collect(Collectors.toList());
   }
 }

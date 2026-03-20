@@ -25,9 +25,11 @@ import com.uit.se356.core.application.authentication.handler.mfa.RecoveryMfaHand
 import com.uit.se356.core.application.authentication.handler.mfa.RemoveMfaMethodHandler;
 import com.uit.se356.core.application.authentication.handler.mfa.VerifyMfaHandler;
 import com.uit.se356.core.application.authentication.handler.permission.AssignPermissionHandler;
+import com.uit.se356.core.application.authentication.handler.permission.GetPermissionByRoleHandler;
 import com.uit.se356.core.application.authentication.handler.permission.PermissionSummaryQueryHandler;
 import com.uit.se356.core.application.authentication.handler.role.CreateRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.DeleteRoleHandler;
+import com.uit.se356.core.application.authentication.handler.role.GetRoleByIdHandler;
 import com.uit.se356.core.application.authentication.handler.role.RoleSummaryQueryHandler;
 import com.uit.se356.core.application.authentication.handler.role.UpdateRoleHandler;
 import com.uit.se356.core.application.authentication.port.in.IssueTokenService;
@@ -278,8 +280,10 @@ public class DependencyInjectionConfig {
 
   @Bean
   CommandHandler<?, ?> assignPermissionHandler(
-      RoleRepository roleRepository, PermissionRepository permissionRepository) {
-    return new AssignPermissionHandler(roleRepository, permissionRepository);
+      RoleRepository roleRepository,
+      PermissionRepository permissionRepository,
+      AuthCacheRepository cacheRepository) {
+    return new AssignPermissionHandler(roleRepository, permissionRepository, cacheRepository);
   }
 
   @Bean
@@ -519,5 +523,12 @@ public class DependencyInjectionConfig {
   @Bean
   QueryHandler<?, ?> getAllVehiclesHandler(VehicleRepository vehicleRepository) {
     return new GetAllVehiclesHandler(vehicleRepository);
+  QueryHandler<?, ?> getPermissionsByRoleHandler(PermissionRepository permissionRepository) {
+    return new GetPermissionByRoleHandler(permissionRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getRoleByIdHandler(RoleRepository roleRepository) {
+    return new GetRoleByIdHandler(roleRepository);
   }
 }

@@ -1,6 +1,7 @@
 package com.uit.se356.core.domain.entities.authentication;
 
 import com.uit.se356.common.exception.AppException;
+import com.uit.se356.core.domain.constants.RoleName;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
 import com.uit.se356.core.domain.vo.authentication.PermissionId;
 import com.uit.se356.core.domain.vo.authentication.RoleId;
@@ -59,7 +60,10 @@ public class Role {
   // ============================ BEHAVIORS ============================
   public void update(String name, String description, boolean isDefault) {
     Objects.requireNonNull(name);
-    if (this.systemRole) {
+    // Chỉ check quyền admin không được sửa
+    // Có role user cũng là systemRole nhưng vẫn cho phép sửa vì có thể cần cập nhật mô tả hoặc đổi
+    // default
+    if (this.systemRole && RoleName.ADMIN.name().equals(name)) {
       throw new AppException(AuthErrorCode.SYSTEM_ROLE_MODIFICATION);
     }
     this.name = name;
@@ -68,7 +72,7 @@ public class Role {
   }
 
   public void assignPermissions(Set<PermissionId> newPermissions) {
-    if (this.systemRole) {
+    if (this.systemRole && RoleName.ADMIN.name().equals(this.name)) {
       throw new AppException(AuthErrorCode.SYSTEM_ROLE_MODIFICATION);
     }
     this.permissions = Objects.requireNonNull(newPermissions);

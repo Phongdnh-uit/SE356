@@ -7,6 +7,7 @@ import com.uit.se356.core.application.area.command.UpdateWardCommand;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.port.WardRepository;
 import com.uit.se356.core.application.area.result.WardResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.area.Ward;
 import com.uit.se356.core.domain.exception.AreaErrorCode;
 import java.util.Optional;
@@ -20,7 +21,11 @@ public class UpdateWardHandler implements CommandHandler<UpdateWardCommand, Ward
     this.provinceRepository = provinceRepository;
   }
 
-  @HasPermission("ward:update")
+  @HasPermission(
+      name = "Update Ward",
+      description = "Permission to update a ward",
+      resource = PermissionConstant.Resource.WARD,
+      action = PermissionConstant.Action.UPDATE)
   @Override
   public WardResult handle(UpdateWardCommand command) {
     Optional<Ward> wardOpt = wardRepository.findById(command.id());

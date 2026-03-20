@@ -54,7 +54,12 @@ public class PermissionScannerImpl implements PermissionScanner {
         annotatedMethods.forEach(
             (method, annotation) -> {
               permissions.add(
-                  new PermissionDefinition(annotation.value(), annotation.description()));
+                  new PermissionDefinition(
+                      annotation.name(),
+                      annotation.description(),
+                      annotation.resource(),
+                      annotation.action(),
+                      annotation.condition()));
             });
 
       } catch (Exception e) {

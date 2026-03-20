@@ -7,6 +7,7 @@ import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.core.application.depot.command.UpdateDepotCommand;
 import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.result.DepotResult;
+import com.uit.se356.core.domain.constants.PermissionConstant;
 import com.uit.se356.core.domain.entities.depot.Depot;
 import com.uit.se356.core.domain.exception.DepotErrorCode;
 import com.uit.se356.core.domain.vo.area.Coordinate;
@@ -23,8 +24,12 @@ public class UpdateDepotHandler implements CommandHandler<UpdateDepotCommand, De
     this.depotRepository = depotRepository;
   }
 
+  @HasPermission(
+      name = "Update Depot",
+      description = "Permission to update a depot",
+      resource = PermissionConstant.Resource.DEPOT,
+      action = PermissionConstant.Action.UPDATE)
   @Override
-  @HasPermission("depot:update")
   public DepotResult handle(UpdateDepotCommand command) {
     List<FieldError> errors = new ArrayList<>();
     // BR: Kiểm tra khoảng cách tối thiểu với các kho hiện tại
