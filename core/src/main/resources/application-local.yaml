@@ -73,6 +73,34 @@ management:
     tags:
       application: core-service
 
+    distribution:
+      percentiles:
+        http:
+          server:
+            requests:
+              - 0.95
+              - 0.99 # Định nghĩa percentiles cho tất cả các endpoint HTTP server
+      percentiles-histogram:
+        http:
+          server:
+            requests: true # Bật histogram cho tất cả các endpoint HTTP server
+      slo:
+        http:
+          server:
+            requests:
+              - 100ms
+              - 300ms
+              - 500ms
+              - 1s # Định nghĩa SLO cho các endpoint HTTP server
+      maximum-expected-value:
+        http:
+          server:
+            requests: 10s # Giới hạn giá trị tối đa cho histogram để tránh bị ảnh hưởng bởi outliers
+      minimum-expected-value:
+        http:
+          server:
+            requests: 10ms # Giới hạn giá trị tối thiểu cho histogram để tránh bị ảnh hưởng bởi outliers
+
 application:
   security:
     jwt:
