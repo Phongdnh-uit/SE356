@@ -7,7 +7,7 @@ public interface RoleSummaryProjection {
 
   String getDescription();
 
-  boolean getisDefault();
+  boolean getIsDefault();
 
   boolean getSystemRole();
 }
