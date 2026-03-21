@@ -3,6 +3,7 @@ package com.uit.se356.core.presentation.rest.auth;
 import com.uit.se356.common.dto.ApiResponse;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.QueryBus;
+import com.uit.se356.core.application.authentication.command.ChangePasswordCommand;
 import com.uit.se356.core.application.authentication.command.LogoutCommand;
 import com.uit.se356.core.application.authentication.command.RegisterCommand;
 import com.uit.se356.core.application.authentication.command.ResetPasswordCommand;
@@ -141,5 +142,13 @@ public class AuthController {
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, cookie.toString())
         .body(ApiResponse.noContent("Logout successful"));
+  }
+
+  @Operation(summary = "Change Password")
+  @PostMapping("/change-password")
+  public ResponseEntity<ApiResponse<Void>> changePassword(
+      @RequestBody ChangePasswordCommand command) {
+    commandBus.dispatch(command);
+    return ResponseEntity.ok(ApiResponse.noContent("Password changed successfully"));
   }
 }

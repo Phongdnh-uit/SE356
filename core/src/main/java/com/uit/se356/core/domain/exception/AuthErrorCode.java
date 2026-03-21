@@ -30,7 +30,8 @@ public enum AuthErrorCode implements ErrorCode {
   PERMISSION_NOT_FOUND("AUTH_023", "error.auth.permission_not_found", 400),
   MFA_METHOD_ALREADY_EXISTS("AUTH_024", "error.auth.mfa_method_already_exists", 400),
   MFA_METHOD_NOT_FOUND("AUTH_025", "error.auth.mfa_method_not_found", 404),
-  MFA_USER_NOT_VERIFIED("AUTH_026", "error.auth.mfa_user_not_verified", 403);
+  MFA_USER_NOT_VERIFIED("AUTH_026", "error.auth.mfa_user_not_verified", 403),
+  CANNOT_ASSIGN_ADMIN_ROLE("AUTH_027", "error.auth.cannot_assign_admin_role", 400);
   private final String code;
   private final String messageKey;
   private final int httpStatus;
