@@ -9,6 +9,7 @@ import com.uit.se356.common.utils.SecurityUtil;
 import com.uit.se356.core.application.area.handler.*;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.port.WardRepository;
+import com.uit.se356.core.application.authentication.handler.ChangePasswordHandler;
 import com.uit.se356.core.application.authentication.handler.LoginQueryHandler;
 import com.uit.se356.core.application.authentication.handler.LogoutHandler;
 import com.uit.se356.core.application.authentication.handler.OAuth2LoginCommandHandler;
@@ -27,6 +28,7 @@ import com.uit.se356.core.application.authentication.handler.mfa.VerifyMfaHandle
 import com.uit.se356.core.application.authentication.handler.permission.AssignPermissionHandler;
 import com.uit.se356.core.application.authentication.handler.permission.GetPermissionByRoleHandler;
 import com.uit.se356.core.application.authentication.handler.permission.PermissionSummaryQueryHandler;
+import com.uit.se356.core.application.authentication.handler.role.AssignUserRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.CreateRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.DeleteRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.GetRoleByIdHandler;
@@ -507,5 +509,19 @@ public class DependencyInjectionConfig {
   @Bean
   QueryHandler<?, ?> getRoleByIdHandler(RoleRepository roleRepository) {
     return new GetRoleByIdHandler(roleRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> changePasswordHandler(
+      UserRepository userRepository,
+      PasswordEncoder passwordEncoder,
+      SecurityUtil<UserId> securityUtil) {
+    return new ChangePasswordHandler(userRepository, passwordEncoder, securityUtil);
+  }
+
+  @Bean
+  CommandHandler<?, ?> assignUserRoleHandler(
+      RoleRepository roleRepository, UserRepository userRepository) {
+    return new AssignUserRoleHandler(userRepository, roleRepository);
   }
 }

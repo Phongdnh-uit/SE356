@@ -109,4 +109,9 @@ public class RoleRepositoryImpl implements RoleRepository {
         roleJpaRepository.findBy(spec, q -> q.as(RoleSummaryProjection.class).page(pageable));
     return PageResponse.from(page);
   }
+
+  @Override
+  public boolean existsById(RoleId roleId) {
+    return roleJpaRepository.existsById(roleId.value());
+  }
 }

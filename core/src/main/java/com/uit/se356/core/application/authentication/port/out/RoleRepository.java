@@ -21,6 +21,8 @@ public interface RoleRepository {
 
   boolean existsByName(String name);
 
+  boolean existsById(RoleId roleId);
+
   void delete(Role role);
 
   PageResponse<RoleSummaryProjection> findAll(SearchPageable searchCriteria);
