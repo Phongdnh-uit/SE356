@@ -42,7 +42,7 @@ public class CustomOAuth2AuthRequestResolver implements OAuth2AuthorizationReque
 
     // Chỉ xử lý cho đăng ký tài khoản mới
     String token = request.getParameter("verificationToken");
-    if (token != null && token.isBlank()) {
+    if (token != null && !token.isBlank()) {
       // Lưu token vào session để sử dụng trong quá trình callback sau này
       request.getSession(true).setAttribute("verificationToken", token);
     }
