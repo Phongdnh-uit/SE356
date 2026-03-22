@@ -58,6 +58,10 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
     HttpSession session = request.getSession(false);
     if (session != null) {
       String token = (String) session.getAttribute("verificationToken");
+      if (token == null || token.isBlank()) {
+        return null; // Nếu không có token trong session, trả về null để tiếp tục đăng nhập bình
+        // thường
+      }
       session.invalidate(); // Xóa session sau khi lấy
       String key = CacheKey.PHONE_VERIFIED_PREFIX + ":" + token;
       String cachedPhone = redisTemplate.opsForValue().get(key);
