@@ -5,6 +5,7 @@ import com.uit.se356.common.dto.SearchPageable;
 import com.uit.se356.common.utils.PageableUtil;
 import com.uit.se356.core.application.area.port.WardRepository;
 import com.uit.se356.core.application.area.projections.WardSummaryProjection;
+import com.uit.se356.core.application.area.projections.WardSummaryProjectionImpl;
 import com.uit.se356.core.domain.entities.area.Ward;
 import com.uit.se356.core.domain.vo.area.WardId;
 import com.uit.se356.core.infrastructure.persistence.entities.area.WardJpaEntity;
@@ -56,9 +57,17 @@ public class WardRepositoryImpl implements WardRepository {
   public PageResponse<WardSummaryProjection> findAll(SearchPageable searchCriteria) {
     Specification<WardJpaEntity> spec = RSQLJPASupport.toSpecification(searchCriteria.filter());
     Pageable pageable = PageableUtil.createPageable(searchCriteria);
-    var page =
-        wardJpaRepository.findBy(spec, q -> q.as(WardSummaryProjection.class).page(pageable));
-    return PageResponse.from(page);
+    var page = wardJpaRepository.findAll(spec, pageable);
+    return PageResponse.from(
+        page,
+        wardEntity ->
+            new WardSummaryProjectionImpl(
+                wardEntity.getId(),
+                wardEntity.getCode(),
+                wardEntity.getName(),
+                wardEntity.getType(),
+                wardEntity.getProvinceId(),
+                wardEntity.getProvince() != null ? wardEntity.getProvince().getName() : null));
   }
 
   @Override
