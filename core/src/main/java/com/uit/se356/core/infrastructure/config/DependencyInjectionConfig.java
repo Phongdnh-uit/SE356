@@ -523,6 +523,8 @@ public class DependencyInjectionConfig {
   @Bean
   QueryHandler<?, ?> getAllVehiclesHandler(VehicleRepository vehicleRepository) {
     return new GetAllVehiclesHandler(vehicleRepository);
+  }
+
   QueryHandler<?, ?> getPermissionsByRoleHandler(PermissionRepository permissionRepository) {
     return new GetPermissionByRoleHandler(permissionRepository);
   }

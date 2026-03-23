@@ -8,7 +8,8 @@ public class Route {
   private final double totalDistance;
   private final double totalTime;
 
-  private Route(DeliveryVehicle vehicle, List<DeliveryTask> tasks, double totalDistance, double totalTime) {
+  private Route(
+      DeliveryVehicle vehicle, List<DeliveryTask> tasks, double totalDistance, double totalTime) {
     this.vehicle = vehicle;
     this.tasks = tasks;
     this.totalDistance = totalDistance;
@@ -16,7 +17,8 @@ public class Route {
   }
 
   // -------- Factory Method --------
-  public static Route create(DeliveryVehicle vehicle, List<DeliveryTask> tasks, double totalDistance, double totalTime) {
+  public static Route create(
+      DeliveryVehicle vehicle, List<DeliveryTask> tasks, double totalDistance, double totalTime) {
     return new Route(vehicle, tasks, totalDistance, totalTime);
   }
 

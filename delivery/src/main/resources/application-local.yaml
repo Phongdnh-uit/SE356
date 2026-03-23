@@ -27,3 +27,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+timefold:
+  solver:
+    # Cấu hình thời gian chạy tối đa cho thuật toán.
+    termination:
+      time-limit: 1m

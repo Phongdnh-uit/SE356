@@ -3,13 +3,12 @@ package com.uit.se356.delivery.domain.entities;
 import com.uit.se356.delivery.domain.vo.Coordinate;
 import com.uit.se356.delivery.domain.vo.OrderId;
 import com.uit.se356.delivery.domain.vo.PhysicalCapacity;
-
 import java.util.Objects;
 
 public class DeliveryTask {
   private final OrderId id;
-  private final Coordinate location;       // Điểm giao đến
-  private final PhysicalCapacity demand;   // Khối lượng/Thể tích của đơn hàng này
+  private final Coordinate location; // Điểm giao đến
+  private final PhysicalCapacity demand; // Khối lượng/Thể tích của đơn hàng này
 
   private DeliveryTask(OrderId id, Coordinate location, PhysicalCapacity demand) {
     this.id = id;
