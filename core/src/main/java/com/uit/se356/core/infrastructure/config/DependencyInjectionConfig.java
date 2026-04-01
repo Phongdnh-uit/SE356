@@ -52,11 +52,9 @@ import com.uit.se356.core.application.authentication.port.out.VerificationSender
 import com.uit.se356.core.application.authentication.services.IssueTokenServiceImpl;
 import com.uit.se356.core.application.authentication.services.PermissionCheckerImpl;
 import com.uit.se356.core.application.authentication.strategies.verification.process.EmailVerificationProcessingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.process.PhoneVerificationProcessingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.process.ProcessVerificationStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.EmailVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.ForgotPasswordSendingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.send.PhoneVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.SendVerificationStrategy;
 import com.uit.se356.core.application.contact.handler.CreateContactHandler;
 import com.uit.se356.core.application.contact.handler.DeleteContactHandler;
@@ -94,14 +92,14 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class DependencyInjectionConfig {
 
-  @Bean
-  PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
-      UserRepository userRepository,
-      AuthCacheRepository cacheRepository,
-      AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationSendingStrategy(
-        userRepository, cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
+  //     UserRepository userRepository,
+  //     AuthCacheRepository cacheRepository,
+  //     AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationSendingStrategy(
+  //       userRepository, cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationSendingStrategy emailVerificationSendingStrategy(
@@ -123,11 +121,11 @@ public class DependencyInjectionConfig {
         userRepository, verificationRepository, verificationConfigPort, idGenerator);
   }
 
-  @Bean
-  PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
-      AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
+  //     AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationProcessingStrategy emailVerificationProcessingStrategy(

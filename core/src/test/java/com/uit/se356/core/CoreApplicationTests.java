@@ -1,5 +1,6 @@
 package com.uit.se356.core;
 
+import com.google.firebase.FirebaseApp;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -7,6 +8,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,6 +18,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @SpringBootTest
 @ActiveProfiles("test")
 class CoreApplicationTests {
+
+  @MockitoBean private FirebaseApp firebaseApp;
 
   @Container @ServiceConnection
   static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16-alpine");
