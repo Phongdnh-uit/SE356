@@ -94,14 +94,14 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class DependencyInjectionConfig {
 
-  @Bean
-  PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
-      UserRepository userRepository,
-      AuthCacheRepository cacheRepository,
-      AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationSendingStrategy(
-        userRepository, cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
+  //     UserRepository userRepository,
+  //     AuthCacheRepository cacheRepository,
+  //     AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationSendingStrategy(
+  //       userRepository, cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationSendingStrategy emailVerificationSendingStrategy(
@@ -123,11 +123,11 @@ public class DependencyInjectionConfig {
         userRepository, verificationRepository, verificationConfigPort, idGenerator);
   }
 
-  @Bean
-  PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
-      AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
+  //     AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationProcessingStrategy emailVerificationProcessingStrategy(

@@ -6,6 +6,7 @@ dependencies {
     val zxingVersion = "3.5.3"
     val googleAuthVersion = "1.5.0"   
     var webAuthn4jVersion = "0.31.1.RELEASE"
+    var firebaseAdminVersion = "9.8.0"
 
     implementation(project(":common"))
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -30,6 +31,7 @@ dependencies {
     implementation ("com.google.zxing:javase:$zxingVersion")
     implementation ("com.warrenstrange:googleauth:$googleAuthVersion")
     implementation("com.webauthn4j:webauthn4j-core:$webAuthn4jVersion")
+    implementation ("com.google.firebase:firebase-admin:$firebaseAdminVersion")
 
 	runtimeOnly("org.postgresql:postgresql")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
