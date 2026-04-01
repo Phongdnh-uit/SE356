@@ -52,11 +52,9 @@ import com.uit.se356.core.application.authentication.port.out.VerificationSender
 import com.uit.se356.core.application.authentication.services.IssueTokenServiceImpl;
 import com.uit.se356.core.application.authentication.services.PermissionCheckerImpl;
 import com.uit.se356.core.application.authentication.strategies.verification.process.EmailVerificationProcessingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.process.PhoneVerificationProcessingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.process.ProcessVerificationStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.EmailVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.ForgotPasswordSendingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.send.PhoneVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.SendVerificationStrategy;
 import com.uit.se356.core.application.contact.handler.CreateContactHandler;
 import com.uit.se356.core.application.contact.handler.DeleteContactHandler;
