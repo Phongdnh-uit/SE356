@@ -9,6 +9,7 @@ import com.uit.se356.core.application.area.command.CreateProvinceCommand;
 import com.uit.se356.core.application.area.command.DeleteProvinceCommand;
 import com.uit.se356.core.application.area.command.UpdateProvinceCommand;
 import com.uit.se356.core.application.area.projections.ProvinceSummaryProjection;
+import com.uit.se356.core.application.area.query.GetProvinceByIdQuery;
 import com.uit.se356.core.application.area.query.ProvinceSummaryQuery;
 import com.uit.se356.core.application.area.result.ProvinceResult;
 import com.uit.se356.core.domain.vo.area.ProvinceId;
@@ -66,5 +67,15 @@ public class ProvinceController {
     ProvinceSummaryQuery query = new ProvinceSummaryQuery(pageable);
     PageResponse<ProvinceSummaryProjection> result = queryBus.dispatch(query);
     return ResponseEntity.ok(ApiResponse.ok(result, "Provinces retrieved successfully"));
+  }
+
+  @Operation(
+      summary = "Get a Province by ID",
+      description = "Lấy thông tin chi tiết của một tỉnh/thành phố theo ID")
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<ProvinceResult>> getProvinceById(
+      @PathVariable("id") String id) {
+    ProvinceResult result = queryBus.dispatch(new GetProvinceByIdQuery(new ProvinceId(id)));
+    return ResponseEntity.ok(ApiResponse.ok(result, "Province retrieved successfully"));
   }
 }
