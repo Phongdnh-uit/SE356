@@ -353,6 +353,11 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  QueryHandler<?, ?> getWardByIdQueryHandler(WardRepository wardRepository) {
+    return new GetWardByIdQueryHandler(wardRepository);
+  }
+
+  @Bean
   QueryHandler<?, ?> wardSummaryQueryHandler(WardRepository wardRepository) {
     return new WardSummaryQueryHandler(wardRepository);
   }
