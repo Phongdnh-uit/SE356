@@ -329,6 +329,11 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  QueryHandler<?, ?> getProvinceByIdQueryHandler(ProvinceRepository provinceRepository) {
+    return new GetProvinceByIdQueryHandler(provinceRepository);
+  }
+
+  @Bean
   CommandHandler<?, ?> createWardHandler(
       WardRepository wardRepository,
       ProvinceRepository provinceRepository,
@@ -345,6 +350,11 @@ public class DependencyInjectionConfig {
   @Bean
   CommandHandler<?, ?> deleteWardHandler(WardRepository wardRepository) {
     return new DeleteWardHandler(wardRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getWardByIdQueryHandler(WardRepository wardRepository) {
+    return new GetWardByIdQueryHandler(wardRepository);
   }
 
   @Bean

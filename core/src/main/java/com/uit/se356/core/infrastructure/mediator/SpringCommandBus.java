@@ -5,6 +5,7 @@ import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.CommandHandler;
+import com.uit.se356.core.infrastructure.middleware.MetricTracker;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringCommandBus implements CommandBus {
   private final Map<Class<? extends Command<?>>, CommandHandler<?, ?>> handlers;
+  private final MetricTracker metricTracker;
 
   @SuppressWarnings("unchecked")
-  public SpringCommandBus(List<CommandHandler<?, ?>> commandHandlers) {
+  public SpringCommandBus(List<CommandHandler<?, ?>> commandHandlers, MetricTracker metricTracker) {
     this.handlers = new HashMap<>();
     commandHandlers.forEach(
         handler -> {
@@ -31,6 +33,7 @@ public class SpringCommandBus implements CommandBus {
             handlers.put((Class<? extends Command<?>>) commandType, handler);
           }
         });
+    this.metricTracker = metricTracker;
   }
 
   @SuppressWarnings("unchecked")
@@ -42,7 +45,11 @@ public class SpringCommandBus implements CommandBus {
       throw new AppException(CommonErrorCode.INTERNAL_ERROR);
     }
     try {
-      return (R) ((CommandHandler<Command<R>, R>) handler).handle(command);
+      return (R)
+          metricTracker.observe(
+              "command",
+              command.getClass().getSimpleName(),
+              () -> ((CommandHandler<Command<R>, R>) handler).handle(command));
     } catch (ClassCastException e) {
       log.error("Handler type mismatch for command: {}", command.getClass().getName(), e);
       throw new AppException(CommonErrorCode.INTERNAL_ERROR);

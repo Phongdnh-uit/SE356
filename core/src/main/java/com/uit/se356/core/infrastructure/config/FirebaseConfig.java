@@ -7,9 +7,11 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @RequiredArgsConstructor
 @Configuration
+@Profile({"render", "prod"})
 public class FirebaseConfig {
 
   @Bean
