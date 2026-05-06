@@ -13,6 +13,7 @@ public interface SecurityConstant {
     "/api/v1/auth/mfa/challenge",
     "/api/v1/auth/mfa/verify",
     "/api/v1/auth/mfa/recovery",
+    "/api/v1/wallet/webhook/**",
   };
   String[] PUBLIC_GET_URLS = {};
 }

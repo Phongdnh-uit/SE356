@@ -9,6 +9,7 @@ import com.uit.se356.core.application.area.command.CreateWardCommand;
 import com.uit.se356.core.application.area.command.DeleteWardCommand;
 import com.uit.se356.core.application.area.command.UpdateWardCommand;
 import com.uit.se356.core.application.area.projections.WardSummaryProjection;
+import com.uit.se356.core.application.area.query.GetWardByIdQuery;
 import com.uit.se356.core.application.area.query.WardSummaryQuery;
 import com.uit.se356.core.application.area.result.WardResult;
 import com.uit.se356.core.domain.vo.area.ProvinceId;
@@ -61,6 +62,13 @@ public class WardController {
   public ResponseEntity<ApiResponse<Void>> deleteWard(@PathVariable String id) {
     commandBus.dispatch(new DeleteWardCommand(new WardId(id)));
     return ResponseEntity.ok(ApiResponse.ok(null, "Ward deleted successfully"));
+  }
+
+  @Operation(summary = "Get Ward by ID (Cấp Xã)")
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<WardResult>> getWardById(@PathVariable("id") String id) {
+    WardResult result = queryBus.dispatch(new GetWardByIdQuery(new WardId(id)));
+    return ResponseEntity.ok(ApiResponse.ok(result, "Ward retrieved successfully"));
   }
 
   @Operation(

@@ -17,6 +17,7 @@ public class AppProperties {
   private Verification verification;
   private Bootstrap bootstrap;
   private S3 s3;
+  private Payment payment;
 
   @Getter
   @Setter
@@ -79,5 +80,22 @@ public class AppProperties {
     private String secretKey;
     private String mainBucketName;
     private String quarantineBucketName;
+  }
+
+  @Getter
+  @Setter
+  public static class Payment {
+    private Momo momo;
+
+    @Getter
+    @Setter
+    public static class Momo {
+      private String partnerCode;
+      private String accessKey;
+      private String secretKey;
+      private String requestUrl;
+      private String returnUrl;
+      private String notifyUrl;
+    }
   }
 }

@@ -103,20 +103,6 @@ public class RegisterCommandHandler implements CommandHandler<RegisterCommand, R
   }
 
   private String getPhoneNumber(String verificationToken) {
-    // Xác thực verificationToken từ cache để lấy số điện thoại đăng ký
-    // StringBuilder cacheKey =
-    //     new StringBuilder(CacheKey.PHONE_VERIFIED_PREFIX)
-    //         .append(":")
-    //         .append(command.verificationToken());
-    // Optional<String> phoneNumberOpt = cacheRepository.get(cacheKey.toString());
-    // if (phoneNumberOpt.isEmpty()) {
-    //   throw new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
-    // }
-    // Xóa verificationToken khỏi cache sau khi đăng ký thành công
-    // cacheRepository.delete(cacheKey.toString());
-
-    // Note: Sử dụng firebase authentication để xác thực số điện thoại, nên không cần xác thực
-    // verificationToken từ cache nữa
     try {
       FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(verificationToken);
       return decodedToken.getClaims().get("phone_number").toString();
