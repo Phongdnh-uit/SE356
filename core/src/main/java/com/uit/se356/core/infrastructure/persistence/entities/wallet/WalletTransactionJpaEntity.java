@@ -1,6 +1,7 @@
 package com.uit.se356.core.infrastructure.persistence.entities.wallet;
 
 import com.uit.se356.common.entity.BaseEntity;
+import com.uit.se356.core.domain.vo.wallet.PaymentProvider;
 import com.uit.se356.core.domain.vo.wallet.TransactionStatus;
 import com.uit.se356.core.domain.vo.wallet.TransactionType;
 import jakarta.persistence.Column;
@@ -41,6 +42,10 @@ public class WalletTransactionJpaEntity extends BaseEntity<String> {
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private TransactionStatus status;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "provider", nullable = false)
+  private PaymentProvider provider;
 
   @Column(name = "reference_id", length = 100)
   private String referenceId;

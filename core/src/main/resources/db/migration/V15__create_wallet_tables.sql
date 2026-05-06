@@ -22,6 +22,7 @@ CREATE TABLE wallet_transactions (
     amount DECIMAL(19,4) NOT NULL,
     type VARCHAR(20) NOT NULL,
     status VARCHAR(20) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
     reference_id VARCHAR(100),
     idempotency_key VARCHAR(100),
     metadata JSONB,

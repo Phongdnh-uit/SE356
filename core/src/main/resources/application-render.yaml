@@ -13,6 +13,10 @@ spring:
       connection-timeout: 30000
       pool-name: LastMileHikariPool
 
+  devtools:
+    restart:
+      enabled: false
+
   # Cấu hình JPA cho môi trường local
   jpa:
     hibernate:
@@ -158,6 +162,14 @@ application:
     secret-key: ${S3_SECRET_KEY}
     main-bucket-name: ${S3_MAIN_BUCKET_NAME}
     quarantine-bucket-name: ${S3_QUARANTINE_BUCKET_NAME}
+  payment:
+    momo:
+      access-key: ${MOMO_ACCESS_KEY}
+      notify-url: ${MOMO_NOTIFY_URL}
+      partner-code: ${MOMO_PARTNER_CODE}
+      request-url: ${MOMO_REQUEST_URL}
+      return-url: ${MOMO_RETURN_URL}
+      secret-key: ${MOMO_SECRET_KEY}
 
 springdoc:
   default-produces-media-type: application/json

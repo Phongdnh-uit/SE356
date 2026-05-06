@@ -1,5 +1,6 @@
 package com.uit.se356.core.domain.entities.wallet;
 
+import com.uit.se356.core.domain.vo.wallet.PaymentProvider;
 import com.uit.se356.core.domain.vo.wallet.TransactionId;
 import com.uit.se356.core.domain.vo.wallet.TransactionStatus;
 import com.uit.se356.core.domain.vo.wallet.TransactionType;
@@ -14,6 +15,7 @@ public class WalletTransaction {
   private final BigDecimal amount;
   private final TransactionType type;
   private TransactionStatus status;
+  private final PaymentProvider provider;
   private final String referenceId;
   private final String idempotencyKey;
   private final String metadata;
@@ -26,6 +28,7 @@ public class WalletTransaction {
       BigDecimal amount,
       TransactionType type,
       TransactionStatus status,
+      PaymentProvider provider,
       String referenceId,
       String idempotencyKey,
       String metadata,
@@ -36,6 +39,7 @@ public class WalletTransaction {
     this.amount = amount;
     this.type = type;
     this.status = status;
+    this.provider = provider;
     this.referenceId = referenceId;
     this.idempotencyKey = idempotencyKey;
     this.metadata = metadata;
@@ -49,6 +53,7 @@ public class WalletTransaction {
       WalletId walletId,
       BigDecimal amount,
       TransactionType type,
+      PaymentProvider provider,
       String referenceId,
       String idempotencyKey,
       String metadata) {
@@ -56,6 +61,7 @@ public class WalletTransaction {
     Objects.requireNonNull(walletId);
     Objects.requireNonNull(amount);
     Objects.requireNonNull(type);
+    Objects.requireNonNull(provider);
 
     Instant now = Instant.now();
     return new WalletTransaction(
@@ -64,6 +70,7 @@ public class WalletTransaction {
         amount,
         type,
         TransactionStatus.PENDING,
+        provider,
         referenceId,
         idempotencyKey,
         metadata,
@@ -77,6 +84,7 @@ public class WalletTransaction {
       BigDecimal amount,
       TransactionType type,
       TransactionStatus status,
+      PaymentProvider provider,
       String referenceId,
       String idempotencyKey,
       String metadata,
@@ -88,6 +96,7 @@ public class WalletTransaction {
         amount,
         type,
         status,
+        provider,
         referenceId,
         idempotencyKey,
         metadata,
@@ -141,5 +150,9 @@ public class WalletTransaction {
 
   public Instant getUpdatedAt() {
     return updatedAt;
+  }
+
+  public PaymentProvider getProvider() {
+    return provider;
   }
 }
