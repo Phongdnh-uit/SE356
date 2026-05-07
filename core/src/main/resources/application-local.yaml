@@ -136,6 +136,14 @@ application:
     secret-key: "minioadmin"
     main-bucket-name: "flashmile-main"
     quarantine-bucket-name: "flashmile-quarantine"
+  payment:
+    momo:
+      access-key: <your-momo-access-key>
+      notify-url: http://localhost:8080/api/v1/payments/callback/momo
+      partner-code: <your-momo-partner-code>
+      request-url: https://test-payment.momo.vn
+      return-url: http://localhost:3000/payment-result
+      secret-key: <your-momo-secret-key>
 
 springdoc:
   swagger-ui:

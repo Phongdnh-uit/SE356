@@ -87,6 +87,13 @@ import com.uit.se356.core.application.vehicle.handler.GetAllVehiclesHandler;
 import com.uit.se356.core.application.vehicle.handler.GetVehicleByIdHandler;
 import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
 import com.uit.se356.core.application.vehicle.port.VehicleRepository;
+import com.uit.se356.core.application.wallet.handler.CreateWalletHandler;
+import com.uit.se356.core.application.wallet.handler.GetMyWalletHandler;
+import com.uit.se356.core.application.wallet.handler.ProcessTopUpWebhookHandler;
+import com.uit.se356.core.application.wallet.handler.TopUpHandler;
+import com.uit.se356.core.application.wallet.port.WalletRepository;
+import com.uit.se356.core.application.wallet.port.WalletTransactionRepository;
+import com.uit.se356.core.application.wallet.strategies.PaymentProviderStrategy;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -554,5 +561,33 @@ public class DependencyInjectionConfig {
   CommandHandler<?, ?> assignUserRoleHandler(
       RoleRepository roleRepository, UserRepository userRepository) {
     return new AssignUserRoleHandler(userRepository, roleRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createWalletHandler(
+      WalletRepository walletRepository, IdGenerator idGenerator) {
+    return new CreateWalletHandler(walletRepository, idGenerator);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getMyWalletHandler(WalletRepository walletRepository) {
+    return new GetMyWalletHandler(walletRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> topUpWalletHandler(
+      WalletRepository walletRepository,
+      WalletTransactionRepository transactionRepository,
+      List<PaymentProviderStrategy> strategies,
+      IdGenerator idGenerator) {
+    return new TopUpHandler(walletRepository, transactionRepository, strategies, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> processTopUpHandler(
+      WalletRepository walletRepository,
+      WalletTransactionRepository transactionRepository,
+      List<PaymentProviderStrategy> strategies) {
+    return new ProcessTopUpWebhookHandler(walletRepository, transactionRepository, strategies);
   }
 }
