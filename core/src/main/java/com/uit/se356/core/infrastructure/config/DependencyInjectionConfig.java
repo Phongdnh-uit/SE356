@@ -82,6 +82,11 @@ import com.uit.se356.core.application.upload.strategies.upload.UploadPolicy;
 import com.uit.se356.core.application.user.handler.GetUserProfileHandler;
 import com.uit.se356.core.application.user.handler.UpdateUserProfileHandler;
 import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.application.vehicle.handler.DeleteVehicleHandler;
+import com.uit.se356.core.application.vehicle.handler.GetAllVehiclesHandler;
+import com.uit.se356.core.application.vehicle.handler.GetVehicleByIdHandler;
+import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
+import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -510,6 +515,24 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  CommandHandler<?, ?> saveVehicleHandler(
+      VehicleRepository vehicleRepository, IdGenerator idGenerator) {
+    return new SaveVehicleHandler(vehicleRepository, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> deleteVehicleHandler(VehicleRepository vehicleRepository) {
+    return new DeleteVehicleHandler(vehicleRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getVehicleByIdHandler(VehicleRepository vehicleRepository) {
+    return new GetVehicleByIdHandler(vehicleRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getAllVehiclesHandler(VehicleRepository vehicleRepository) {
+    return new GetAllVehiclesHandler(vehicleRepository);
   QueryHandler<?, ?> getPermissionsByRoleHandler(PermissionRepository permissionRepository) {
     return new GetPermissionByRoleHandler(permissionRepository);
   }
