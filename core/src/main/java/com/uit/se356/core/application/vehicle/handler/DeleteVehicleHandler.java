@@ -5,6 +5,8 @@ import com.uit.se356.common.security.HasPermission;
 import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.core.application.vehicle.command.DeleteVehicleCommand;
 import com.uit.se356.core.application.vehicle.port.VehicleRepository;
+import com.uit.se356.core.domain.constants.PermissionConstant.Action;
+import com.uit.se356.core.domain.constants.PermissionConstant.Resource;
 import com.uit.se356.core.domain.exception.VehicleErrorCode;
 
 public class DeleteVehicleHandler implements CommandHandler<DeleteVehicleCommand, Void> {
@@ -15,7 +17,11 @@ public class DeleteVehicleHandler implements CommandHandler<DeleteVehicleCommand
   }
 
   @Override
-  @HasPermission("vehicle:delete")
+  @HasPermission(
+      name = "delete_vehicle",
+      description = "The permission to delete a vehicle",
+      resource = Resource.VEHICLE,
+      action = Action.DELETE)
   public Void handle(DeleteVehicleCommand command) {
     vehicleRepository
         .findById(command.id())
