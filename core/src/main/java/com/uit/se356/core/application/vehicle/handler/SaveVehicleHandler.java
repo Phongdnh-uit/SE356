@@ -7,6 +7,8 @@ import com.uit.se356.common.utils.IdGenerator;
 import com.uit.se356.core.application.vehicle.command.SaveVehicleCommand;
 import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.application.vehicle.result.VehicleResult;
+import com.uit.se356.core.domain.constants.PermissionConstant.Action;
+import com.uit.se356.core.domain.constants.PermissionConstant.Resource;
 import com.uit.se356.core.domain.entities.vehicle.Vehicle;
 import com.uit.se356.core.domain.exception.VehicleErrorCode;
 import com.uit.se356.core.domain.vo.vehicle.PhysicalCapacity;
@@ -23,7 +25,11 @@ public class SaveVehicleHandler implements CommandHandler<SaveVehicleCommand, Ve
   }
 
   @Override
-  @HasPermission("vehicle:save")
+  @HasPermission(
+      name = "vehicle:save",
+      description = "Quản lý phương tiện: Thêm mới hoặc cập nhật thông tin phương tiện",
+      resource = Resource.VEHICLE,
+      action = Action.CREATE)
   public VehicleResult handle(SaveVehicleCommand command) {
     boolean isUpdate = command.id() != null && !command.id().value().isBlank();
 
