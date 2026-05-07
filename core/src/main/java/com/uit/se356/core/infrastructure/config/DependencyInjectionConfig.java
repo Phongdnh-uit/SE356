@@ -71,6 +71,8 @@ import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.port.RouteCheckingPort;
 import com.uit.se356.core.application.internal.handler.DebugOtpHandler;
 import com.uit.se356.core.application.internal.handler.SyncPermissionHandler;
+import com.uit.se356.core.application.order.handler.*;
+import com.uit.se356.core.application.order.port.OrderRepository;
 import com.uit.se356.core.application.upload.handler.ConfirmUploadCommandHandler;
 import com.uit.se356.core.application.upload.handler.UploadPresignedUrlHandler;
 import com.uit.se356.core.application.upload.port.in.FileCleanupService;
@@ -592,5 +594,46 @@ public class DependencyInjectionConfig {
       WalletTransactionRepository transactionRepository,
       List<PaymentProviderStrategy> strategies) {
     return new ProcessTopUpWebhookHandler(walletRepository, transactionRepository, strategies);
+  }
+
+  @Bean
+  CommandHandler<?, ?> assignDriverHandler(OrderRepository orderRepository) {
+    return new AssignDriverHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> confirmOrderHandler(OrderRepository orderRepository) {
+    return new ConfirmOrderHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createOrderHandler(
+      OrderRepository orderRepository, IdGenerator idGenerator) {
+    return new CreateOrderHandler(orderRepository, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> deliverOrderHandler(OrderRepository orderRepository) {
+    return new DeliverOrderHandler(orderRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> orderDetailQueryHandler(OrderRepository orderRepository) {
+    return new OrderDetailQueryHandler(orderRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> orderSummaryQueryHandler(OrderRepository orderRepository) {
+    return new OrderSummaryQueryHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> startDeliveryHandler(OrderRepository orderRepository) {
+    return new StartDeliveryHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> updateRecipientHandler(OrderRepository orderRepository) {
+    return new UpdateRecipientHandler(orderRepository);
   }
 }
