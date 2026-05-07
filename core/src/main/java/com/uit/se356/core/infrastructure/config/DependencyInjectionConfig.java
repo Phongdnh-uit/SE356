@@ -9,6 +9,7 @@ import com.uit.se356.common.utils.SecurityUtil;
 import com.uit.se356.core.application.area.handler.*;
 import com.uit.se356.core.application.area.port.ProvinceRepository;
 import com.uit.se356.core.application.area.port.WardRepository;
+import com.uit.se356.core.application.authentication.handler.ChangePasswordHandler;
 import com.uit.se356.core.application.authentication.handler.LoginQueryHandler;
 import com.uit.se356.core.application.authentication.handler.LogoutHandler;
 import com.uit.se356.core.application.authentication.handler.OAuth2LoginCommandHandler;
@@ -27,6 +28,7 @@ import com.uit.se356.core.application.authentication.handler.mfa.VerifyMfaHandle
 import com.uit.se356.core.application.authentication.handler.permission.AssignPermissionHandler;
 import com.uit.se356.core.application.authentication.handler.permission.GetPermissionByRoleHandler;
 import com.uit.se356.core.application.authentication.handler.permission.PermissionSummaryQueryHandler;
+import com.uit.se356.core.application.authentication.handler.role.AssignUserRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.CreateRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.DeleteRoleHandler;
 import com.uit.se356.core.application.authentication.handler.role.GetRoleByIdHandler;
@@ -50,11 +52,9 @@ import com.uit.se356.core.application.authentication.port.out.VerificationSender
 import com.uit.se356.core.application.authentication.services.IssueTokenServiceImpl;
 import com.uit.se356.core.application.authentication.services.PermissionCheckerImpl;
 import com.uit.se356.core.application.authentication.strategies.verification.process.EmailVerificationProcessingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.process.PhoneVerificationProcessingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.process.ProcessVerificationStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.EmailVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.ForgotPasswordSendingStrategy;
-import com.uit.se356.core.application.authentication.strategies.verification.send.PhoneVerificationSendingStrategy;
 import com.uit.se356.core.application.authentication.strategies.verification.send.SendVerificationStrategy;
 import com.uit.se356.core.application.contact.handler.CreateContactHandler;
 import com.uit.se356.core.application.contact.handler.DeleteContactHandler;
@@ -87,6 +87,13 @@ import com.uit.se356.core.application.vehicle.handler.GetAllVehiclesHandler;
 import com.uit.se356.core.application.vehicle.handler.GetVehicleByIdHandler;
 import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
 import com.uit.se356.core.application.vehicle.port.VehicleRepository;
+import com.uit.se356.core.application.wallet.handler.CreateWalletHandler;
+import com.uit.se356.core.application.wallet.handler.GetMyWalletHandler;
+import com.uit.se356.core.application.wallet.handler.ProcessTopUpWebhookHandler;
+import com.uit.se356.core.application.wallet.handler.TopUpHandler;
+import com.uit.se356.core.application.wallet.port.WalletRepository;
+import com.uit.se356.core.application.wallet.port.WalletTransactionRepository;
+import com.uit.se356.core.application.wallet.strategies.PaymentProviderStrategy;
 import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -97,14 +104,14 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class DependencyInjectionConfig {
 
-  @Bean
-  PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
-      UserRepository userRepository,
-      AuthCacheRepository cacheRepository,
-      AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationSendingStrategy(
-        userRepository, cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationSendingStrategy phoneVerificationSendingStrategy(
+  //     UserRepository userRepository,
+  //     AuthCacheRepository cacheRepository,
+  //     AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationSendingStrategy(
+  //       userRepository, cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationSendingStrategy emailVerificationSendingStrategy(
@@ -126,11 +133,11 @@ public class DependencyInjectionConfig {
         userRepository, verificationRepository, verificationConfigPort, idGenerator);
   }
 
-  @Bean
-  PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
-      AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
-    return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
-  }
+  // @Bean
+  // PhoneVerificationProcessingStrategy phoneVerificationProcessingStrategy(
+  //     AuthCacheRepository cacheRepository, AuthConfigPort verificationConfigPort) {
+  //   return new PhoneVerificationProcessingStrategy(cacheRepository, verificationConfigPort);
+  // }
 
   @Bean
   EmailVerificationProcessingStrategy emailVerificationProcessingStrategy(
@@ -334,6 +341,11 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  QueryHandler<?, ?> getProvinceByIdQueryHandler(ProvinceRepository provinceRepository) {
+    return new GetProvinceByIdQueryHandler(provinceRepository);
+  }
+
+  @Bean
   CommandHandler<?, ?> createWardHandler(
       WardRepository wardRepository,
       ProvinceRepository provinceRepository,
@@ -350,6 +362,11 @@ public class DependencyInjectionConfig {
   @Bean
   CommandHandler<?, ?> deleteWardHandler(WardRepository wardRepository) {
     return new DeleteWardHandler(wardRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getWardByIdQueryHandler(WardRepository wardRepository) {
+    return new GetWardByIdQueryHandler(wardRepository);
   }
 
   @Bean
@@ -533,5 +550,47 @@ public class DependencyInjectionConfig {
   @Bean
   QueryHandler<?, ?> getRoleByIdHandler(RoleRepository roleRepository) {
     return new GetRoleByIdHandler(roleRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> changePasswordHandler(
+      UserRepository userRepository,
+      PasswordEncoder passwordEncoder,
+      SecurityUtil<UserId> securityUtil) {
+    return new ChangePasswordHandler(userRepository, passwordEncoder, securityUtil);
+  }
+
+  @Bean
+  CommandHandler<?, ?> assignUserRoleHandler(
+      RoleRepository roleRepository, UserRepository userRepository) {
+    return new AssignUserRoleHandler(userRepository, roleRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createWalletHandler(
+      WalletRepository walletRepository, IdGenerator idGenerator) {
+    return new CreateWalletHandler(walletRepository, idGenerator);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getMyWalletHandler(WalletRepository walletRepository) {
+    return new GetMyWalletHandler(walletRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> topUpWalletHandler(
+      WalletRepository walletRepository,
+      WalletTransactionRepository transactionRepository,
+      List<PaymentProviderStrategy> strategies,
+      IdGenerator idGenerator) {
+    return new TopUpHandler(walletRepository, transactionRepository, strategies, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> processTopUpHandler(
+      WalletRepository walletRepository,
+      WalletTransactionRepository transactionRepository,
+      List<PaymentProviderStrategy> strategies) {
+    return new ProcessTopUpWebhookHandler(walletRepository, transactionRepository, strategies);
   }
 }

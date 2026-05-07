@@ -5,7 +5,9 @@ public interface RoleSummaryProjection {
 
   String getName();
 
-  boolean getisDefault();
+  String getDescription();
+
+  boolean getIsDefault();
 
   boolean getSystemRole();
 }

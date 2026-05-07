@@ -1,9 +1,11 @@
 package com.uit.se356.core.infrastructure.security.oauth2;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.core.application.authentication.command.OAuth2LoginCommand;
 import com.uit.se356.core.application.authentication.handler.OAuth2LoginCommandHandler;
-import com.uit.se356.core.domain.constants.CacheKey;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
 import com.uit.se356.core.infrastructure.security.CustomUserPrincipal;
@@ -58,17 +60,29 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
     HttpSession session = request.getSession(false);
     if (session != null) {
       String token = (String) session.getAttribute("verificationToken");
-      session.invalidate(); // Xóa session sau khi lấy
-      String key = CacheKey.PHONE_VERIFIED_PREFIX + ":" + token;
-      String cachedPhone = redisTemplate.opsForValue().get(key);
-      if (cachedPhone == null) {
-        // Dùng wrapper để bắt lỗi
-        Throwable ex = new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
-        throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR), ex);
+      if (token == null || token.isBlank()) {
+        return null; // Nếu không có token trong session, trả về null để tiếp tục đăng nhập bình
+        // thường
       }
-      // Xóa cache sau khi lấy
-      redisTemplate.delete(key);
-      return cachedPhone;
+      session.invalidate(); // Xóa session sau khi lấy
+      // String key = CacheKey.PHONE_VERIFIED_PREFIX + ":" + token;
+      // String cachedPhone = redisTemplate.opsForValue().get(key);
+      // if (cachedPhone == null) {
+      //   // Dùng wrapper để bắt lỗi
+      //   Throwable ex = new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
+      //   throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR),
+      // ex);
+      // }
+      // // Xóa cache sau khi lấy
+      // redisTemplate.delete(key);
+      // return cachedPhone;
+
+      try {
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+        return decodedToken.getClaims().get("phone_number").toString();
+      } catch (FirebaseAuthException e) {
+        throw new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
+      }
     }
 
     return null;

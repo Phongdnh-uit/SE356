@@ -29,6 +29,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -90,6 +91,11 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .cors(Customizer.withDefaults())
         .formLogin(AbstractHttpConfigurer::disable)
+        .headers(
+            headers ->
+                headers.addHeaderWriter(
+                    new StaticHeadersWriter(
+                        "Cross-Origin-Opener-Policy", "same-origin-allow-popups")))
         .oauth2Login(
             oauth2 ->
                 oauth2

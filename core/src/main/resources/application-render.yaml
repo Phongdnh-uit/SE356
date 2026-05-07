@@ -13,6 +13,10 @@ spring:
       connection-timeout: 30000
       pool-name: LastMileHikariPool
 
+  devtools:
+    restart:
+      enabled: false
+
   # Cấu hình JPA cho môi trường local
   jpa:
     hibernate:
@@ -95,6 +99,33 @@ management:
     tags:
       application: ${spring.application.name:core-service} # Lấy tên app tự động
       env: render # Phân biệt môi trường
+    distribution:
+      percentiles:
+        http:
+          server:
+            requests:
+              - 0.95
+              - 0.99 # Định nghĩa percentiles cho tất cả các endpoint HTTP server
+      percentiles-histogram:
+        http:
+          server:
+            requests: true # Bật histogram cho tất cả các endpoint HTTP server
+      slo:
+        http:
+          server:
+            requests:
+              - 100ms
+              - 300ms
+              - 500ms
+              - 1s # Định nghĩa SLO cho các endpoint HTTP server
+      maximum-expected-value:
+        http:
+          server:
+            requests: 10s # Giới hạn giá trị tối đa cho histogram để tránh bị ảnh hưởng bởi outliers
+      minimum-expected-value:
+        http:
+          server:
+            requests: 10ms # Giới hạn giá trị tối thiểu cho histogram để tránh bị ảnh hưởng bởi outliers
 
 application:
   security:
@@ -131,6 +162,14 @@ application:
     secret-key: ${S3_SECRET_KEY}
     main-bucket-name: ${S3_MAIN_BUCKET_NAME}
     quarantine-bucket-name: ${S3_QUARANTINE_BUCKET_NAME}
+  payment:
+    momo:
+      access-key: ${MOMO_ACCESS_KEY}
+      notify-url: ${MOMO_NOTIFY_URL}
+      partner-code: ${MOMO_PARTNER_CODE}
+      request-url: ${MOMO_REQUEST_URL}
+      return-url: ${MOMO_RETURN_URL}
+      secret-key: ${MOMO_SECRET_KEY}
 
 springdoc:
   default-produces-media-type: application/json

@@ -7,6 +7,7 @@ import com.uit.se356.common.dto.SearchRequest;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.QueryBus;
 import com.uit.se356.core.application.authentication.command.permission.AssignPermissionCommand;
+import com.uit.se356.core.application.authentication.command.role.AssignUserRoleCommand;
 import com.uit.se356.core.application.authentication.command.role.CreateRoleCommand;
 import com.uit.se356.core.application.authentication.command.role.DeleteRoleCommand;
 import com.uit.se356.core.application.authentication.command.role.UpdateRoleCommand;
@@ -18,6 +19,7 @@ import com.uit.se356.core.application.authentication.query.role.RoleSummaryQuery
 import com.uit.se356.core.application.authentication.result.RoleResult;
 import com.uit.se356.core.domain.vo.authentication.PermissionId;
 import com.uit.se356.core.domain.vo.authentication.RoleId;
+import com.uit.se356.core.domain.vo.authentication.UserId;
 import com.uit.se356.core.presentation.dto.role.AssignPermissionRequest;
 import com.uit.se356.core.presentation.dto.role.UpdateRoleRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -103,5 +105,14 @@ public class RoleController {
         ApiResponse.ok(
             queryBus.dispatch(new GetRoleByIdQuery(new RoleId(id))),
             "Role retrieved successfully"));
+  }
+
+  @PostMapping("/{id}/assign/{userId}")
+  public ResponseEntity<ApiResponse<Void>> assignRoleToUser(
+      @PathVariable("id") String roleId, @PathVariable("userId") String userId) {
+    AssignUserRoleCommand command =
+        new AssignUserRoleCommand(new RoleId(roleId), new UserId(userId));
+    commandBus.dispatch(command);
+    return ResponseEntity.ok(ApiResponse.noContent("Role assigned to user successfully"));
   }
 }

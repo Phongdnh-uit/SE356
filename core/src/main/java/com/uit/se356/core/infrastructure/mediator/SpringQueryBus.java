@@ -5,6 +5,7 @@ import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
 import com.uit.se356.common.services.QueryBus;
 import com.uit.se356.common.services.QueryHandler;
+import com.uit.se356.core.infrastructure.middleware.MetricTracker;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringQueryBus implements QueryBus {
   private final Map<Class<? extends Query<?>>, QueryHandler<?, ?>> handlers;
+  private final MetricTracker metricTracker;
 
   @SuppressWarnings("unchecked")
-  public SpringQueryBus(List<QueryHandler<?, ?>> queryHandlers) {
+  public SpringQueryBus(List<QueryHandler<?, ?>> queryHandlers, MetricTracker metricTracker) {
     this.handlers = new HashMap<>();
     queryHandlers.forEach(
         handler -> {
@@ -31,6 +33,7 @@ public class SpringQueryBus implements QueryBus {
             handlers.put((Class<? extends Query<?>>) queryType, handler);
           }
         });
+    this.metricTracker = metricTracker;
   }
 
   @SuppressWarnings("unchecked")
@@ -42,7 +45,11 @@ public class SpringQueryBus implements QueryBus {
       throw new AppException(CommonErrorCode.INTERNAL_ERROR);
     }
     try {
-      return (R) ((QueryHandler<Query<R>, R>) handler).handle(query);
+      return (R)
+          metricTracker.observe(
+              "query",
+              query.getClass().getSimpleName(),
+              () -> ((QueryHandler<Query<R>, R>) handler).handle(query));
     } catch (ClassCastException e) {
       log.error("Handler type mismatch for query: {}", query.getClass().getName(), e);
       throw new AppException(CommonErrorCode.INTERNAL_ERROR);

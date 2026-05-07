@@ -13,5 +13,5 @@ public interface DepotSummaryProjection {
 
   Double getLng();
 
-  boolean isStartNode();
+  boolean getIsStartNode();
 }
