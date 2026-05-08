@@ -20,4 +20,9 @@ public class WardSummaryProjectionImpl implements WardSummaryProjection {
   public ProvinceId getProvinceId() {
     return new ProvinceId(this.provinceId);
   }
+
+  @Override
+  public String getProvinceName() {
+    return this.provinceName;
+  }
 }
