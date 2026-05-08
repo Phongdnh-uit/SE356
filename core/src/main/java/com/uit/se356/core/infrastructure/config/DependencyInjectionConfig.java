@@ -71,6 +71,8 @@ import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.port.RouteCheckingPort;
 import com.uit.se356.core.application.internal.handler.DebugOtpHandler;
 import com.uit.se356.core.application.internal.handler.SyncPermissionHandler;
+import com.uit.se356.core.application.order.handler.*;
+import com.uit.se356.core.application.order.port.OrderRepository;
 import com.uit.se356.core.application.upload.handler.ConfirmUploadCommandHandler;
 import com.uit.se356.core.application.upload.handler.UploadPresignedUrlHandler;
 import com.uit.se356.core.application.upload.port.in.FileCleanupService;
@@ -82,6 +84,11 @@ import com.uit.se356.core.application.upload.strategies.upload.UploadPolicy;
 import com.uit.se356.core.application.user.handler.GetUserProfileHandler;
 import com.uit.se356.core.application.user.handler.UpdateUserProfileHandler;
 import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.application.vehicle.handler.DeleteVehicleHandler;
+import com.uit.se356.core.application.vehicle.handler.GetAllVehiclesHandler;
+import com.uit.se356.core.application.vehicle.handler.GetVehicleByIdHandler;
+import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
+import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.application.wallet.handler.CreateWalletHandler;
 import com.uit.se356.core.application.wallet.handler.GetMyWalletHandler;
 import com.uit.se356.core.application.wallet.handler.ProcessTopUpWebhookHandler;
@@ -517,6 +524,27 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  CommandHandler<?, ?> saveVehicleHandler(
+      VehicleRepository vehicleRepository, IdGenerator idGenerator) {
+    return new SaveVehicleHandler(vehicleRepository, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> deleteVehicleHandler(VehicleRepository vehicleRepository) {
+    return new DeleteVehicleHandler(vehicleRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getVehicleByIdHandler(VehicleRepository vehicleRepository) {
+    return new GetVehicleByIdHandler(vehicleRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getAllVehiclesHandler(VehicleRepository vehicleRepository) {
+    return new GetAllVehiclesHandler(vehicleRepository);
+  }
+
+  @Bean
   QueryHandler<?, ?> getPermissionsByRoleHandler(PermissionRepository permissionRepository) {
     return new GetPermissionByRoleHandler(permissionRepository);
   }
@@ -566,5 +594,46 @@ public class DependencyInjectionConfig {
       WalletTransactionRepository transactionRepository,
       List<PaymentProviderStrategy> strategies) {
     return new ProcessTopUpWebhookHandler(walletRepository, transactionRepository, strategies);
+  }
+
+  @Bean
+  CommandHandler<?, ?> assignDriverHandler(OrderRepository orderRepository) {
+    return new AssignDriverHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> confirmOrderHandler(OrderRepository orderRepository) {
+    return new ConfirmOrderHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createOrderHandler(
+      OrderRepository orderRepository, IdGenerator idGenerator) {
+    return new CreateOrderHandler(orderRepository, idGenerator);
+  }
+
+  @Bean
+  CommandHandler<?, ?> deliverOrderHandler(OrderRepository orderRepository) {
+    return new DeliverOrderHandler(orderRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> orderDetailQueryHandler(OrderRepository orderRepository) {
+    return new OrderDetailQueryHandler(orderRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> orderSummaryQueryHandler(OrderRepository orderRepository) {
+    return new OrderSummaryQueryHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> startDeliveryHandler(OrderRepository orderRepository) {
+    return new StartDeliveryHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> updateRecipientHandler(OrderRepository orderRepository) {
+    return new UpdateRecipientHandler(orderRepository);
   }
 }
