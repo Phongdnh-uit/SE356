@@ -1,6 +1,10 @@
 package com.uit.se356.core.infrastructure.repositories.authentication;
 
+import com.uit.se356.common.dto.PageResponse;
+import com.uit.se356.common.dto.SearchPageable;
+import com.uit.se356.common.utils.PageableUtil;
 import com.uit.se356.core.application.user.port.UserRepository;
+import com.uit.se356.core.application.user.projections.UserSummaryProjection;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.vo.authentication.Email;
 import com.uit.se356.core.domain.vo.authentication.PhoneNumber;
@@ -11,13 +15,14 @@ import com.uit.se356.core.infrastructure.persistence.entities.authentication.Use
 import com.uit.se356.core.infrastructure.persistence.mappers.authentication.UserPersistenceMapper;
 import com.uit.se356.core.infrastructure.persistence.repositories.authentication.RoleJpaRepository;
 import com.uit.se356.core.infrastructure.persistence.repositories.authentication.UserJpaRepository;
+import io.github.perplexhub.rsql.RSQLJPASupport;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,20 +96,44 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public List<User> findAll() {
-    return userJpaRepository.findAllWithRole().stream()
-        .map(userPersistenceMapper::toDomain)
-        .collect(Collectors.toList());
+  public PageResponse<User> findByStatus(UserStatus status, SearchPageable pageable) {
+    Pageable pageableObj = PageableUtil.createPageable(pageable);
+    var page =
+        userJpaRepository.findByStatus(status, pageableObj).map(userPersistenceMapper::toDomain);
+    return PageResponse.from(page);
+  }
+
+  //  @Override
+  //  public List<User> findAll() {
+  //    return userJpaRepository.findAllWithRole().stream()
+  //        .map(userPersistenceMapper::toDomain)
+  //        .collect(Collectors.toList());
+  //  }
+
+  @Override
+  public PageResponse<User> findAll(SearchPageable pageable) {
+    Pageable pageableObj = PageableUtil.createPageable(pageable);
+    var page = userJpaRepository.findAllWithRole(pageableObj).map(userPersistenceMapper::toDomain);
+    return PageResponse.from(page);
   }
 
   @Override
-  public Page<User> findByStatus(UserStatus status, Pageable pageable) {
-    return userJpaRepository.findByStatus(status, pageable).map(userPersistenceMapper::toDomain);
+  public PageResponse<UserSummaryProjection> findByStatusProjection(
+      UserStatus status, SearchPageable pageable) {
+    Specification<UserJpaEntity> spec = (root, query, cb) -> cb.equal(root.get("status"), status);
+    Pageable pageableObj = PageableUtil.createPageable(pageable);
+    var page =
+        userJpaRepository.findBy(spec, q -> q.as(UserSummaryProjection.class).page(pageableObj));
+    return PageResponse.from(page);
   }
 
   @Override
-  public Page<User> findAll(Pageable pageable) {
-    return userJpaRepository.findAllWithRole(pageable).map(userPersistenceMapper::toDomain);
+  public PageResponse<UserSummaryProjection> findAllProjection(SearchPageable pageable) {
+    Specification<UserJpaEntity> spec = RSQLJPASupport.toSpecification(pageable.filter());
+    Pageable pageableObj = PageableUtil.createPageable(pageable);
+    var page =
+        userJpaRepository.findBy(spec, q -> q.as(UserSummaryProjection.class).page(pageableObj));
+    return PageResponse.from(page);
   }
 
   @Override
