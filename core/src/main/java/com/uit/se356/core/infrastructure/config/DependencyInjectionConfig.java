@@ -81,8 +81,7 @@ import com.uit.se356.core.application.upload.port.out.StorageProvider;
 import com.uit.se356.core.application.upload.services.FileCleanupServiceImpl;
 import com.uit.se356.core.application.upload.strategies.upload.AvatarUploadPolicy;
 import com.uit.se356.core.application.upload.strategies.upload.UploadPolicy;
-import com.uit.se356.core.application.user.handler.GetUserProfileHandler;
-import com.uit.se356.core.application.user.handler.UpdateUserProfileHandler;
+import com.uit.se356.core.application.user.handler.*;
 import com.uit.se356.core.application.user.port.UserRepository;
 import com.uit.se356.core.application.vehicle.handler.DeleteVehicleHandler;
 import com.uit.se356.core.application.vehicle.handler.GetAllVehiclesHandler;
@@ -258,6 +257,37 @@ public class DependencyInjectionConfig {
   @Bean
   CommandHandler<?, ?> updateUserProfileHandler(UserRepository userRepository) {
     return new UpdateUserProfileHandler(userRepository);
+  }
+
+  @Bean
+  public GetUsersByStatusHandler getUsersByStatusHandler(UserRepository userRepository) {
+    return new GetUsersByStatusHandler(userRepository);
+  }
+
+  @Bean
+  public FindUserByEmailHandler findUserByEmailHandler(UserRepository userRepository) {
+    return new FindUserByEmailHandler(userRepository);
+  }
+
+  @Bean
+  public FindUserByPhoneHandler findUserByPhoneHandler(UserRepository userRepository) {
+    return new FindUserByPhoneHandler(userRepository);
+  }
+
+  @Bean
+  public UpdateUserRoleHandler updateUserRoleHandler(
+      UserRepository userRepository, RoleRepository roleRepository) {
+    return new UpdateUserRoleHandler(userRepository, roleRepository);
+  }
+
+  @Bean
+  public UpdateUserStatusHandler updateUserStatusHandler(UserRepository userRepository) {
+    return new UpdateUserStatusHandler(userRepository);
+  }
+
+  @Bean
+  public DeleteUserHandler deleteUserHandler(UserRepository userRepository) {
+    return new DeleteUserHandler(userRepository);
   }
 
   @Bean
