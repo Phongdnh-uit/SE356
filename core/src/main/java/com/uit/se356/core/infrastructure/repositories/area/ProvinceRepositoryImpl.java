@@ -13,6 +13,7 @@ import com.uit.se356.core.infrastructure.persistence.entities.area.ProvinceJpaEn
 import com.uit.se356.core.infrastructure.persistence.mappers.area.ProvincePersistenceMapper;
 import com.uit.se356.core.infrastructure.persistence.repositories.area.ProvinceJpaRepository;
 import io.github.perplexhub.rsql.RSQLJPASupport;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,16 @@ public class ProvinceRepositoryImpl implements ProvinceRepository {
     ProvinceJpaEntity entity = provincePersistenceMapper.toEntity(province);
     ProvinceJpaEntity savedProvince = provinceJpaRepository.save(entity);
     return provincePersistenceMapper.toDomain(savedProvince);
+  }
+
+  @Override
+  @Transactional
+  public List<Province> createAll(List<Province> provinces) {
+    List<ProvinceJpaEntity> entities =
+        provinces.stream().map(provincePersistenceMapper::toEntity).toList();
+    return provinceJpaRepository.saveAll(entities).stream()
+        .map(provincePersistenceMapper::toDomain)
+        .toList();
   }
 
   @Override

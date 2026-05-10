@@ -12,6 +12,7 @@ import com.uit.se356.core.infrastructure.persistence.entities.area.WardJpaEntity
 import com.uit.se356.core.infrastructure.persistence.mappers.area.WardPersistenceMapper;
 import com.uit.se356.core.infrastructure.persistence.repositories.area.WardJpaRepository;
 import io.github.perplexhub.rsql.RSQLJPASupport;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,15 @@ public class WardRepositoryImpl implements WardRepository {
     WardJpaEntity wardJpaEntity = wardPersistenceMapper.toEntity(ward);
     WardJpaEntity savedEntity = wardJpaRepository.save(wardJpaEntity);
     return wardPersistenceMapper.toDomain(savedEntity);
+  }
+
+  @Override
+  @Transactional
+  public List<Ward> createAll(List<Ward> wards) {
+    List<WardJpaEntity> entities = wards.stream().map(wardPersistenceMapper::toEntity).toList();
+    return wardJpaRepository.saveAll(entities).stream()
+        .map(wardPersistenceMapper::toDomain)
+        .toList();
   }
 
   @Override
