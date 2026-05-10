@@ -15,14 +15,12 @@ import com.uit.se356.core.infrastructure.persistence.entities.authentication.Use
 import com.uit.se356.core.infrastructure.persistence.mappers.authentication.UserPersistenceMapper;
 import com.uit.se356.core.infrastructure.persistence.repositories.authentication.RoleJpaRepository;
 import com.uit.se356.core.infrastructure.persistence.repositories.authentication.UserJpaRepository;
-import io.github.perplexhub.rsql.RSQLJPASupport;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,20 +118,14 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public PageResponse<UserSummaryProjection> findByStatusProjection(
       UserStatus status, SearchPageable pageable) {
-    Specification<UserJpaEntity> spec = (root, query, cb) -> cb.equal(root.get("status"), status);
     Pageable pageableObj = PageableUtil.createPageable(pageable);
-    var page =
-        userJpaRepository.findBy(spec, q -> q.as(UserSummaryProjection.class).page(pageableObj));
-    return PageResponse.from(page);
+    return PageResponse.from(userJpaRepository.findByStatusWithRoleProjection(status, pageableObj));
   }
 
   @Override
   public PageResponse<UserSummaryProjection> findAllProjection(SearchPageable pageable) {
-    Specification<UserJpaEntity> spec = RSQLJPASupport.toSpecification(pageable.filter());
     Pageable pageableObj = PageableUtil.createPageable(pageable);
-    var page =
-        userJpaRepository.findBy(spec, q -> q.as(UserSummaryProjection.class).page(pageableObj));
-    return PageResponse.from(page);
+    return PageResponse.from(userJpaRepository.findAllProjection(pageableObj));
   }
 
   @Override
