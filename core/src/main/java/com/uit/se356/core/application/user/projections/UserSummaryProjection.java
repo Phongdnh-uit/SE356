@@ -8,4 +8,4 @@ public record UserSummaryProjection(
     String roleName,
     String phoneNumber,
     String email,
-    UserStatus userStatus) {}
+    UserStatus status) {}
