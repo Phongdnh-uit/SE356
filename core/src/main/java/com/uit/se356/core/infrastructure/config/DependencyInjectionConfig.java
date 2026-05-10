@@ -260,33 +260,38 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
-  public GetUsersByStatusHandler getUsersByStatusHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> userSummaryQueryHandler(UserRepository userRepository) {
+    return new UserSummaryQueryHandler(userRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getUsersByStatusHandler(UserRepository userRepository) {
     return new GetUsersByStatusHandler(userRepository);
   }
 
   @Bean
-  public FindUserByEmailHandler findUserByEmailHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> findUserByEmailHandler(UserRepository userRepository) {
     return new FindUserByEmailHandler(userRepository);
   }
 
   @Bean
-  public FindUserByPhoneHandler findUserByPhoneHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> findUserByPhoneHandler(UserRepository userRepository) {
     return new FindUserByPhoneHandler(userRepository);
   }
 
   @Bean
-  public UpdateUserRoleHandler updateUserRoleHandler(
+  CommandHandler<?, ?> updateUserRoleHandler(
       UserRepository userRepository, RoleRepository roleRepository) {
     return new UpdateUserRoleHandler(userRepository, roleRepository);
   }
 
   @Bean
-  public UpdateUserStatusHandler updateUserStatusHandler(UserRepository userRepository) {
+  CommandHandler<?, ?> updateUserStatusHandler(UserRepository userRepository) {
     return new UpdateUserStatusHandler(userRepository);
   }
 
   @Bean
-  public DeleteUserHandler deleteUserHandler(UserRepository userRepository) {
+  CommandHandler<?, ?> deleteUserHandler(UserRepository userRepository) {
     return new DeleteUserHandler(userRepository);
   }
 
