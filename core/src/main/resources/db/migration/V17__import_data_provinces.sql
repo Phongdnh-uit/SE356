@@ -1,3 +1,6 @@
+-- V17__import_data_provinces.sql
+-- Insert data for provinces table with actual province information
+
 INSERT INTO provinces (id, code, name, type) VALUES
                                                  ('1', '91', 'An Giang', 'PROVINCE'),
                                                  ('2', '24', 'Bắc Ninh', 'PROVINCE'),
