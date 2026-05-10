@@ -109,7 +109,8 @@ public class RecipientContactController {
   @Operation(summary = "Delete a contact from address book")
   @DeleteMapping("/{contactId}")
   public ResponseEntity<ApiResponse<Void>> deleteContact(
-      @PathVariable @NotBlank(message = "Contact ID cannot be blank") String contactId) {
+      @PathVariable("contactId") @NotBlank(message = "Contact ID cannot be blank")
+          String contactId) {
 
     UserId currentUserId = getCurrentUserId();
 
