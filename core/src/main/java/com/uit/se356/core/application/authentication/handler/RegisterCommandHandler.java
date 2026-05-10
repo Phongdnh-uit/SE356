@@ -1,5 +1,8 @@
 package com.uit.se356.core.application.authentication.handler;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.uit.se356.common.dto.FieldError;
 import com.uit.se356.common.exception.AppException;
 import com.uit.se356.common.exception.CommonErrorCode;
@@ -13,7 +16,6 @@ import com.uit.se356.core.application.authentication.port.out.RoleRepository;
 import com.uit.se356.core.application.authentication.query.SendVerificationCodeQuery;
 import com.uit.se356.core.application.authentication.result.RegisterResult;
 import com.uit.se356.core.application.user.port.UserRepository;
-import com.uit.se356.core.domain.constants.CacheKey;
 import com.uit.se356.core.domain.entities.authentication.Role;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.exception.AuthErrorCode;
@@ -24,7 +26,6 @@ import com.uit.se356.core.domain.vo.authentication.UserId;
 import com.uit.se356.core.domain.vo.authentication.VerificationChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RegisterCommandHandler implements CommandHandler<RegisterCommand, RegisterResult> {
   private final AuthCacheRepository cacheRepository;
@@ -52,16 +53,8 @@ public class RegisterCommandHandler implements CommandHandler<RegisterCommand, R
   @Override
   public RegisterResult handle(RegisterCommand command) {
     List<FieldError> errors = new ArrayList<>();
-    // Xác thực verificationToken từ cache để lấy số điện thoại đăng ký
-    StringBuilder cacheKey =
-        new StringBuilder(CacheKey.PHONE_VERIFIED_PREFIX)
-            .append(":")
-            .append(command.verificationToken());
-    Optional<String> phoneNumberOpt = cacheRepository.get(cacheKey.toString());
-    if (phoneNumberOpt.isEmpty()) {
-      throw new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
-    }
-    PhoneNumber phoneNumber = new PhoneNumber(phoneNumberOpt.get());
+
+    PhoneNumber phoneNumber = new PhoneNumber(getPhoneNumber(command.verificationToken()));
     Email email = new Email(command.email());
     if (userRepository.existsByEmail(email)) {
       errors.add(
@@ -93,8 +86,6 @@ public class RegisterCommandHandler implements CommandHandler<RegisterCommand, R
             defaultRole.getId());
     user.verifyPhone();
     user = userRepository.create(user);
-    // Xóa verificationToken khỏi cache sau khi đăng ký thành công
-    cacheRepository.delete(cacheKey.toString());
     // Gửi email xác nhận
     SendVerificationCodeQuery sendEmailVerificationCodeQuery =
         new SendVerificationCodeQuery(
@@ -109,5 +100,14 @@ public class RegisterCommandHandler implements CommandHandler<RegisterCommand, R
         user.getPhoneNumber().value(),
         user.isEmailVerified(),
         user.isPhoneVerified());
+  }
+
+  private String getPhoneNumber(String verificationToken) {
+    try {
+      FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(verificationToken);
+      return decodedToken.getClaims().get("phone_number").toString();
+    } catch (FirebaseAuthException e) {
+      throw new AppException(AuthErrorCode.INVALID_VERIFICATION_CODE);
+    }
   }
 }

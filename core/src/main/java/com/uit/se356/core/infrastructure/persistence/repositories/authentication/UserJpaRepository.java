@@ -1,6 +1,7 @@
 package com.uit.se356.core.infrastructure.persistence.repositories.authentication;
 
 import com.uit.se356.common.repository.CommonRepository;
+import com.uit.se356.core.application.user.projections.UserSummaryProjection;
 import com.uit.se356.core.domain.vo.authentication.UserStatus;
 import com.uit.se356.core.infrastructure.persistence.entities.authentication.UserJpaEntity;
 import java.util.List;
@@ -50,4 +51,36 @@ public interface UserJpaRepository extends CommonRepository<UserJpaEntity, Strin
 
   @Query("SELECT u FROM UserJpaEntity u JOIN FETCH u.role WHERE u.role.id = :roleId")
   List<UserJpaEntity> findByRoleId(@Param("roleId") String value);
+
+  @Query(
+"""
+SELECT new com.uit.se356.core.application.user.projections.UserSummaryProjection(
+    u.id,
+    u.fullName,
+    r.name,
+    u.phoneNumber,
+    u.email,
+    u.status
+)
+FROM UserJpaEntity u
+JOIN u.role r
+""")
+  Page<UserSummaryProjection> findAllProjection(Pageable pageable);
+
+  @Query(
+"""
+SELECT new com.uit.se356.core.application.user.projections.UserSummaryProjection(
+    u.id,
+    u.fullName,
+    r.name,
+    u.phoneNumber,
+    u.email,
+    u.status
+)
+FROM UserJpaEntity u
+JOIN u.role r
+WHERE u.status = :status
+""")
+  Page<UserSummaryProjection> findByStatusWithRoleProjection(
+      @Param("status") UserStatus status, Pageable pageable);
 }

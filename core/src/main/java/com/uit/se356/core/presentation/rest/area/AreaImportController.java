@@ -4,6 +4,7 @@ import com.uit.se356.common.dto.ApiResponse;
 import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.core.application.area.command.ImportProvinceGeoJsonCommand;
 import com.uit.se356.core.application.area.command.ImportWardGeoJsonCommand;
+import com.uit.se356.core.application.area.result.ImportResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,11 @@ public class AreaImportController {
   @Operation(summary = "Import Provinces from GeoJSON file")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping(value = "/provinces/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ApiResponse<Integer>> importProvinces(
+  public ResponseEntity<ApiResponse<ImportResult>> importProvinces(
       @RequestPart("file") MultipartFile file) {
 
     ImportProvinceGeoJsonCommand command = new ImportProvinceGeoJsonCommand(file);
-    Integer importedCount = commandBus.dispatch(command);
+    ImportResult importedCount = commandBus.dispatch(command);
 
     return ResponseEntity.ok(
         ApiResponse.ok(importedCount, "Successfully imported " + importedCount + " provinces."));
@@ -37,10 +38,11 @@ public class AreaImportController {
   @Operation(summary = "Import Wards from GeoJSON file")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping(value = "/wards/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ApiResponse<Integer>> importWards(@RequestPart("file") MultipartFile file) {
+  public ResponseEntity<ApiResponse<ImportResult>> importWards(
+      @RequestPart("file") MultipartFile file) {
 
     ImportWardGeoJsonCommand command = new ImportWardGeoJsonCommand(file);
-    Integer importedCount = commandBus.dispatch(command);
+    ImportResult importedCount = commandBus.dispatch(command);
 
     return ResponseEntity.ok(
         ApiResponse.ok(importedCount, "Successfully imported " + importedCount + " wards."));

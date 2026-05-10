@@ -164,6 +164,11 @@ public class User {
     }
   }
 
+  public void updateRole(RoleId newRoleId) {
+    Objects.requireNonNull(newRoleId);
+    this.roleId = newRoleId;
+  }
+
   // ============================ GETTERS ============================
   public UserId getId() {
     return id;

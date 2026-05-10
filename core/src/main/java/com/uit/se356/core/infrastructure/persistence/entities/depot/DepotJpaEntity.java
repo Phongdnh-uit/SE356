@@ -32,5 +32,5 @@ public class DepotJpaEntity extends BaseEntity<String> {
   private Double lng;
 
   @Column(name = "is_start_node", nullable = false)
-  private boolean startNode;
+  private boolean isStartNode;
 }

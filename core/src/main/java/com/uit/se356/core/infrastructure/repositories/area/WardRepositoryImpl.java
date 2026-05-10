@@ -5,12 +5,14 @@ import com.uit.se356.common.dto.SearchPageable;
 import com.uit.se356.common.utils.PageableUtil;
 import com.uit.se356.core.application.area.port.WardRepository;
 import com.uit.se356.core.application.area.projections.WardSummaryProjection;
+import com.uit.se356.core.application.area.projections.WardSummaryProjectionImpl;
 import com.uit.se356.core.domain.entities.area.Ward;
 import com.uit.se356.core.domain.vo.area.WardId;
 import com.uit.se356.core.infrastructure.persistence.entities.area.WardJpaEntity;
 import com.uit.se356.core.infrastructure.persistence.mappers.area.WardPersistenceMapper;
 import com.uit.se356.core.infrastructure.persistence.repositories.area.WardJpaRepository;
 import io.github.perplexhub.rsql.RSQLJPASupport;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,15 @@ public class WardRepositoryImpl implements WardRepository {
     WardJpaEntity wardJpaEntity = wardPersistenceMapper.toEntity(ward);
     WardJpaEntity savedEntity = wardJpaRepository.save(wardJpaEntity);
     return wardPersistenceMapper.toDomain(savedEntity);
+  }
+
+  @Override
+  @Transactional
+  public List<Ward> createAll(List<Ward> wards) {
+    List<WardJpaEntity> entities = wards.stream().map(wardPersistenceMapper::toEntity).toList();
+    return wardJpaRepository.saveAll(entities).stream()
+        .map(wardPersistenceMapper::toDomain)
+        .toList();
   }
 
   @Override
@@ -56,9 +67,17 @@ public class WardRepositoryImpl implements WardRepository {
   public PageResponse<WardSummaryProjection> findAll(SearchPageable searchCriteria) {
     Specification<WardJpaEntity> spec = RSQLJPASupport.toSpecification(searchCriteria.filter());
     Pageable pageable = PageableUtil.createPageable(searchCriteria);
-    var page =
-        wardJpaRepository.findBy(spec, q -> q.as(WardSummaryProjection.class).page(pageable));
-    return PageResponse.from(page);
+    var page = wardJpaRepository.findAll(spec, pageable);
+    return PageResponse.from(
+        page,
+        wardEntity ->
+            new WardSummaryProjectionImpl(
+                wardEntity.getId(),
+                wardEntity.getCode(),
+                wardEntity.getName(),
+                wardEntity.getType(),
+                wardEntity.getProvinceId(),
+                wardEntity.getProvince() != null ? wardEntity.getProvince().getName() : null));
   }
 
   @Override

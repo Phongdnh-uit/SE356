@@ -21,6 +21,8 @@ import com.uit.se356.core.presentation.dto.contact.CreateContactRequest;
 import com.uit.se356.core.presentation.dto.contact.UpdateContactRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +51,8 @@ public class RecipientContactController {
 
   @Operation(summary = "Auto-fill lookup by phone number")
   @GetMapping("/lookup")
-  public ResponseEntity<ApiResponse<ContactResult>> lookupContact(@RequestParam String phone) {
+  public ResponseEntity<ApiResponse<ContactResult>> lookupContact(
+      @RequestParam @NotBlank(message = "Phone number cannot be blank") String phone) {
     UserId currentUserId = getCurrentUserId();
 
     GetContactByPhoneQuery query = new GetContactByPhoneQuery(currentUserId, phone);
@@ -64,7 +67,7 @@ public class RecipientContactController {
   @Operation(summary = "Add a new contact to address book")
   @PostMapping
   public ResponseEntity<ApiResponse<ContactResult>> createContact(
-      @RequestBody CreateContactRequest request) {
+      @RequestBody @Valid CreateContactRequest request) {
 
     UserId currentUserId = getCurrentUserId();
 
@@ -84,7 +87,8 @@ public class RecipientContactController {
   @Operation(summary = "Update an existing contact")
   @PutMapping("/{contactId}")
   public ResponseEntity<ApiResponse<ContactResult>> updateContact(
-      @PathVariable("contactId") String contactId, @RequestBody UpdateContactRequest request) {
+      @PathVariable("contactId") @NotBlank(message = "Contact ID cannot be blank") String contactId,
+      @RequestBody @Valid UpdateContactRequest request) {
 
     UserId currentUserId = getCurrentUserId();
 
@@ -104,7 +108,9 @@ public class RecipientContactController {
 
   @Operation(summary = "Delete a contact from address book")
   @DeleteMapping("/{contactId}")
-  public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable String contactId) {
+  public ResponseEntity<ApiResponse<Void>> deleteContact(
+      @PathVariable("contactId") @NotBlank(message = "Contact ID cannot be blank")
+          String contactId) {
 
     UserId currentUserId = getCurrentUserId();
 

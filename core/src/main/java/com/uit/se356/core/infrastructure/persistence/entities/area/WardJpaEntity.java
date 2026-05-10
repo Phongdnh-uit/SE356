@@ -36,4 +36,12 @@ public class WardJpaEntity extends BaseEntity<String> {
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "polygon", columnDefinition = "jsonb")
   private String polygon;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(
+      name = "province_id",
+      referencedColumnName = "id",
+      insertable = false,
+      updatable = false)
+  private ProvinceJpaEntity province;
 }
