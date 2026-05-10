@@ -25,6 +25,7 @@ import com.uit.se356.core.presentation.dto.user.UpdateUserStatusRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,7 +83,7 @@ public class UserController {
 
   @GetMapping("/all")
   public ResponseEntity<ApiResponse<PageResponse<UserSummaryProjection>>> getAllUserProfiles(
-      SearchPageable pageable) {
+      @ParameterObject SearchPageable pageable) {
     GetAllUserProfilesQuery query = new GetAllUserProfilesQuery(pageable);
     PageResponse<UserSummaryProjection> result = queryBus.dispatch(query);
     return ResponseEntity.ok(ApiResponse.ok(result, "All profiles retrieved successfully"));
