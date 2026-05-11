@@ -2,6 +2,7 @@ package com.uit.se356.core.domain.vo.order;
 
 public enum OrderStatus {
   PENDING("Chờ xác nhận"),
+  PAID("Đã thanh toán"),
   CONFIRMED("Đã xác nhận"),
   ASSIGNED("Được giao cho tài xế"),
   IN_TRANSIT("Đang giao hàng"),
