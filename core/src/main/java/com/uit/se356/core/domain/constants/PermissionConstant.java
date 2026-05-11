@@ -8,6 +8,7 @@ public interface PermissionConstant {
     String DEPOT = "depot";
     String ROLE = "role";
     String PERMISSION = "permission";
+    String TICKET = "ticket";
   }
 
   public interface Action {

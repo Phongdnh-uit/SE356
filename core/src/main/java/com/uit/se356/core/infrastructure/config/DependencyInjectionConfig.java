@@ -71,6 +71,8 @@ import com.uit.se356.core.application.depot.port.DepotRepository;
 import com.uit.se356.core.application.depot.port.RouteCheckingPort;
 import com.uit.se356.core.application.internal.handler.DebugOtpHandler;
 import com.uit.se356.core.application.internal.handler.SyncPermissionHandler;
+import com.uit.se356.core.application.ticket.handler.*;
+import com.uit.se356.core.application.ticket.port.out.TicketRepository;
 import com.uit.se356.core.application.upload.handler.ConfirmUploadCommandHandler;
 import com.uit.se356.core.application.upload.handler.UploadPresignedUrlHandler;
 import com.uit.se356.core.application.upload.port.in.FileCleanupService;
@@ -566,5 +568,42 @@ public class DependencyInjectionConfig {
       WalletTransactionRepository transactionRepository,
       List<PaymentProviderStrategy> strategies) {
     return new ProcessTopUpWebhookHandler(walletRepository, transactionRepository, strategies);
+  }
+
+  @Bean
+  CommandHandler<?, ?> createTicketHandler(
+      TicketRepository ticketRepository,
+      IdGenerator idGenerator,
+      SecurityUtil<UserId> securityUtil) {
+    return new CreateTicketHandler(ticketRepository, idGenerator, securityUtil);
+  }
+
+  @Bean
+  CommandHandler<?, ?> addTicketCommentHandler(
+      TicketRepository ticketRepository, SecurityUtil<UserId> securityUtil) {
+    return new AddTicketCommentHandler(ticketRepository, securityUtil);
+  }
+
+  @Bean
+  CommandHandler<?, ?> processTicketHandler(
+      TicketRepository ticketRepository, SecurityUtil<UserId> securityUtil) {
+    return new ProcessTicketHandler(ticketRepository, securityUtil);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getMyTicketsHandler(
+      TicketRepository ticketRepository, SecurityUtil<UserId> securityUtil) {
+    return new GetMyTicketsHandler(ticketRepository, securityUtil);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getAllTicketsHandler(TicketRepository ticketRepository) {
+    return new GetAllTicketsHandler(ticketRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getTicketDetailsHandler(
+      TicketRepository ticketRepository, SecurityUtil<UserId> securityUtil) {
+    return new GetTicketDetailsHandler(ticketRepository, securityUtil);
   }
 }
