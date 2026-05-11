@@ -48,17 +48,20 @@ public class RecipientContactRepositoryImpl implements RecipientContactRepositor
 
   @Override
   public PageResponse<RecipientContact> findAll(UserId ownerId, SearchPageable searchCriteria) {
+
     Specification<RecipientContactJpaEntity> ownerSpec =
         (root, query, criteriaBuilder) ->
             criteriaBuilder.equal(root.get("userId"), ownerId.value());
 
-    Specification<RecipientContactJpaEntity> rsqlSpec = null;
-    if (searchCriteria.filter() != null && !searchCriteria.filter().isBlank()) {
-      rsqlSpec = RSQLJPASupport.toSpecification(searchCriteria.filter());
-    }
+    Specification<RecipientContactJpaEntity> finalSpec = Specification.where(ownerSpec);
 
-    Specification<RecipientContactJpaEntity> finalSpec =
-        Specification.where(ownerSpec).and(rsqlSpec);
+    if (searchCriteria.filter() != null && !searchCriteria.filter().isBlank()) {
+
+      Specification<RecipientContactJpaEntity> rsqlSpec =
+          RSQLJPASupport.toSpecification(searchCriteria.filter());
+
+      finalSpec = finalSpec.and(rsqlSpec);
+    }
 
     Pageable pageable = PageableUtil.createPageable(searchCriteria);
 

@@ -277,8 +277,15 @@ public class Order {
   }
 
   // ==================== Business Methods ====================
-  public void confirmOrder() {
+  public void markAsPaid() {
     if (this.status != OrderStatus.PENDING) {
+      throw new AppException(OrderErrorCode.INVALID_ORDER_STATUS);
+    }
+    this.status = OrderStatus.PAID;
+  }
+
+  public void confirmOrder() {
+    if (this.status != OrderStatus.PENDING && this.status != OrderStatus.PAID) {
       throw new AppException(OrderErrorCode.INVALID_ORDER_STATUS);
     }
     this.status = OrderStatus.CONFIRMED;

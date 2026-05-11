@@ -1,6 +1,7 @@
 package com.uit.se356.core.infrastructure.config;
 
 import com.uit.se356.common.security.PermissionScanner;
+import com.uit.se356.common.services.CommandBus;
 import com.uit.se356.common.services.CommandHandler;
 import com.uit.se356.common.services.QueryBus;
 import com.uit.se356.common.services.QueryHandler;
@@ -90,8 +91,10 @@ import com.uit.se356.core.application.vehicle.handler.SaveVehicleHandler;
 import com.uit.se356.core.application.vehicle.port.VehicleRepository;
 import com.uit.se356.core.application.wallet.handler.CreateWalletHandler;
 import com.uit.se356.core.application.wallet.handler.GetMyWalletHandler;
+import com.uit.se356.core.application.wallet.handler.PayWithWalletHandler;
 import com.uit.se356.core.application.wallet.handler.ProcessTopUpWebhookHandler;
 import com.uit.se356.core.application.wallet.handler.TopUpHandler;
+import com.uit.se356.core.application.wallet.port.WalletNotificationPort;
 import com.uit.se356.core.application.wallet.port.WalletRepository;
 import com.uit.se356.core.application.wallet.port.WalletTransactionRepository;
 import com.uit.se356.core.application.wallet.strategies.PaymentProviderStrategy;
@@ -99,6 +102,7 @@ import com.uit.se356.core.domain.vo.authentication.UserId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
 
 /** Cấu hình các bean cho hệ thống, chủ yếu từ tầng application để decoupling với framework */
@@ -260,33 +264,38 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
-  public GetUsersByStatusHandler getUsersByStatusHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> userSummaryQueryHandler(UserRepository userRepository) {
+    return new UserSummaryQueryHandler(userRepository);
+  }
+
+  @Bean
+  QueryHandler<?, ?> getUsersByStatusHandler(UserRepository userRepository) {
     return new GetUsersByStatusHandler(userRepository);
   }
 
   @Bean
-  public FindUserByEmailHandler findUserByEmailHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> findUserByEmailHandler(UserRepository userRepository) {
     return new FindUserByEmailHandler(userRepository);
   }
 
   @Bean
-  public FindUserByPhoneHandler findUserByPhoneHandler(UserRepository userRepository) {
+  QueryHandler<?, ?> findUserByPhoneHandler(UserRepository userRepository) {
     return new FindUserByPhoneHandler(userRepository);
   }
 
   @Bean
-  public UpdateUserRoleHandler updateUserRoleHandler(
+  CommandHandler<?, ?> updateUserRoleHandler(
       UserRepository userRepository, RoleRepository roleRepository) {
     return new UpdateUserRoleHandler(userRepository, roleRepository);
   }
 
   @Bean
-  public UpdateUserStatusHandler updateUserStatusHandler(UserRepository userRepository) {
+  CommandHandler<?, ?> updateUserStatusHandler(UserRepository userRepository) {
     return new UpdateUserStatusHandler(userRepository);
   }
 
   @Bean
-  public DeleteUserHandler deleteUserHandler(UserRepository userRepository) {
+  CommandHandler<?, ?> deleteUserHandler(UserRepository userRepository) {
     return new DeleteUserHandler(userRepository);
   }
 
@@ -619,6 +628,16 @@ public class DependencyInjectionConfig {
   }
 
   @Bean
+  CommandHandler<?, ?> payWithWalletHandler(
+      WalletRepository walletRepository,
+      WalletTransactionRepository transactionRepository,
+      WalletNotificationPort notificationPort,
+      IdGenerator idGenerator) {
+    return new PayWithWalletHandler(
+        walletRepository, transactionRepository, notificationPort, idGenerator);
+  }
+
+  @Bean
   CommandHandler<?, ?> processTopUpHandler(
       WalletRepository walletRepository,
       WalletTransactionRepository transactionRepository,
@@ -665,5 +684,11 @@ public class DependencyInjectionConfig {
   @Bean
   CommandHandler<?, ?> updateRecipientHandler(OrderRepository orderRepository) {
     return new UpdateRecipientHandler(orderRepository);
+  }
+
+  @Bean
+  CommandHandler<?, ?> payOrderHandler(
+      OrderRepository orderRepository, @Lazy CommandBus commandBus) {
+    return new PayOrderHandler(orderRepository, commandBus);
   }
 }
