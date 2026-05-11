@@ -20,9 +20,6 @@ public class FindUserByEmailHandler
   public UserProfileResult handle(FindUserByEmailQuery query) {
     return userRepository
         .findProfileByEmail(new Email(query.email()))
-        .orElseThrow(
-            () ->
-                new AppException(
-                    UserErrorCode.USER_NOT_FOUND, "User not found with email: " + query.email()));
+        .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND, query.email()));
   }
 }

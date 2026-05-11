@@ -20,10 +20,6 @@ public class FindUserByPhoneHandler
   public UserProfileResult handle(FindUserByPhoneQuery query) {
     return userRepository
         .findProfileByPhone(new PhoneNumber(query.phoneNumber()))
-        .orElseThrow(
-            () ->
-                new AppException(
-                    UserErrorCode.USER_NOT_FOUND,
-                    "User not found with phone: " + query.phoneNumber()));
+        .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND, query.phoneNumber()));
   }
 }

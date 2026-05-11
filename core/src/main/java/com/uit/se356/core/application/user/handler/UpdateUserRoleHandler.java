@@ -8,6 +8,7 @@ import com.uit.se356.core.application.user.port.UserRepository;
 import com.uit.se356.core.application.user.result.UserProfileResult;
 import com.uit.se356.core.domain.entities.authentication.Role;
 import com.uit.se356.core.domain.entities.authentication.User;
+import com.uit.se356.core.domain.exception.AuthErrorCode;
 import com.uit.se356.core.domain.exception.UserErrorCode;
 
 public class UpdateUserRoleHandler
@@ -31,11 +32,7 @@ public class UpdateUserRoleHandler
     Role role =
         roleRepository
             .findById(command.roleId())
-            .orElseThrow(
-                () ->
-                    new AppException(
-                        UserErrorCode
-                            .USER_NOT_FOUND)); // Nên dùng RoleErrorCode.ROLE_NOT_FOUND nếu có
+            .orElseThrow(() -> new AppException(AuthErrorCode.ROLE_NOT_FOUND));
 
     user.updateRole(command.roleId());
     userRepository.update(user);
