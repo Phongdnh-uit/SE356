@@ -65,6 +65,8 @@ public class DepotRepositoryImpl implements DepotRepository {
 
   @Override
   public boolean hasNearbyDepot(double lat, double lng, double radiusInKm, DepotId excludeDepotId) {
-    return repository.existsDepotWithinRadius(lat, lng, radiusInKm, excludeDepotId.value());
+    String excludeIdValue = (excludeDepotId != null) ? excludeDepotId.value() : null;
+
+    return repository.existsDepotWithinRadius(lat, lng, radiusInKm, excludeIdValue);
   }
 }
