@@ -5,7 +5,6 @@ import com.uit.se356.common.services.QueryHandler;
 import com.uit.se356.core.application.user.port.UserRepository;
 import com.uit.se356.core.application.user.query.FindUserByEmailQuery;
 import com.uit.se356.core.application.user.result.UserProfileResult;
-import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.exception.UserErrorCode;
 import com.uit.se356.core.domain.vo.authentication.Email;
 
@@ -19,10 +18,11 @@ public class FindUserByEmailHandler
 
   @Override
   public UserProfileResult handle(FindUserByEmailQuery query) {
-    User user =
-        userRepository
-            .findByEmail(new Email(query.email()))
-            .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
-    return UserProfileResult.fromUser(user);
+    return userRepository
+        .findProfileByEmail(new Email(query.email()))
+        .orElseThrow(
+            () ->
+                new AppException(
+                    UserErrorCode.USER_NOT_FOUND, "User not found with email: " + query.email()));
   }
 }

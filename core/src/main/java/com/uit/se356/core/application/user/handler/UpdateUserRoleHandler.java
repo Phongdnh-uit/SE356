@@ -23,24 +23,25 @@ public class UpdateUserRoleHandler
 
   @Override
   public UserProfileResult handle(UpdateUserRoleCommand command) {
-    // 1. Kiểm tra xem user có tồn tại không
     User user =
         userRepository
             .findById(command.userId())
             .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
-    // 2. Kiểm tra xem role có tồn tại không
     Role role =
         roleRepository
             .findById(command.roleId())
-            .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+            .orElseThrow(
+                () ->
+                    new AppException(
+                        UserErrorCode
+                            .USER_NOT_FOUND)); // Nên dùng RoleErrorCode.ROLE_NOT_FOUND nếu có
 
-    // 3. Cập nhật role cho user
     user.updateRole(command.roleId());
+    userRepository.update(user);
 
-    // 4. Lưu user vào database
-    User updatedUser = userRepository.update(user);
-
-    return UserProfileResult.fromUser(updatedUser);
+    return userRepository
+        .findProfileById(user.getId())
+        .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
   }
 }
