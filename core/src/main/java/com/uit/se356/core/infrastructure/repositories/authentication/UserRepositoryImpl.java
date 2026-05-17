@@ -5,6 +5,7 @@ import com.uit.se356.common.dto.SearchPageable;
 import com.uit.se356.common.utils.PageableUtil;
 import com.uit.se356.core.application.user.port.UserRepository;
 import com.uit.se356.core.application.user.projections.UserSummaryProjection;
+import com.uit.se356.core.application.user.result.UserProfileResult;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.vo.authentication.Email;
 import com.uit.se356.core.domain.vo.authentication.PhoneNumber;
@@ -84,6 +85,21 @@ public class UserRepositoryImpl implements UserRepository {
     return userJpaRepository
         .findByPhoneNumber(phoneNumber.value())
         .map(userPersistenceMapper::toDomain);
+  }
+
+  @Override
+  public Optional<UserProfileResult> findProfileById(UserId id) {
+    return userJpaRepository.findProfileDtoById(id.value());
+  }
+
+  @Override
+  public Optional<UserProfileResult> findProfileByEmail(Email email) {
+    return userJpaRepository.findProfileDtoByEmail(email.value());
+  }
+
+  @Override
+  public Optional<UserProfileResult> findProfileByPhone(PhoneNumber phone) {
+    return userJpaRepository.findProfileDtoByPhone(phone.value());
   }
 
   @Override

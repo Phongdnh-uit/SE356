@@ -3,6 +3,7 @@ package com.uit.se356.core.application.user.port;
 import com.uit.se356.common.dto.PageResponse;
 import com.uit.se356.common.dto.SearchPageable;
 import com.uit.se356.core.application.user.projections.UserSummaryProjection;
+import com.uit.se356.core.application.user.result.UserProfileResult;
 import com.uit.se356.core.domain.entities.authentication.User;
 import com.uit.se356.core.domain.vo.authentication.Email;
 import com.uit.se356.core.domain.vo.authentication.PhoneNumber;
@@ -22,6 +23,12 @@ public interface UserRepository {
   Optional<User> findByEmail(Email email);
 
   Optional<User> findByPhoneNumber(PhoneNumber phoneNumber);
+
+  Optional<UserProfileResult> findProfileById(UserId id);
+
+  Optional<UserProfileResult> findProfileByEmail(Email email);
+
+  Optional<UserProfileResult> findProfileByPhone(PhoneNumber phone);
 
   // Cần tối ưu, nếu load hết sẽ gây tràn bộ nhớ
   List<User> findByStatus(UserStatus status);

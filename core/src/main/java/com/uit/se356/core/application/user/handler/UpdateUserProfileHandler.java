@@ -19,21 +19,21 @@ public class UpdateUserProfileHandler
 
   @Override
   public UserProfileResult handle(UpdateUserProfileCommand command) {
-    // Fetch User Data
     User user =
         userRepository
             .findById(command.userId())
             .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
-    // BR: Check for Changes (MSG5)
     boolean isNameUnchanged = command.fullName().equals(user.getFullName());
-
     if (isNameUnchanged) {
       throw new AppException(UserErrorCode.NO_CHANGE_DETECTED);
     }
 
     user.updateProfile(command.fullName());
-    User updatedUser = userRepository.update(user);
-    return UserProfileResult.fromUser(updatedUser);
+    userRepository.update(user);
+
+    return userRepository
+        .findProfileById(user.getId())
+        .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
   }
 }
