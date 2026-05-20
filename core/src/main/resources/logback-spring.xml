@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- Include default Spring Boot logging patterns if needed -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
 
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="SE356"/>
+    <!-- Properties -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="se356"/>
     <property name="LOG_PATH" value="./logs" />
 
+    <!-- Loki Properties -->
+    <springProperty scope="context" name="LOKI_URL" source="loki.url"/>
+    <springProperty scope="context" name="LOKI_USERNAME" source="loki.username"/>
+    <springProperty scope="context" name="LOKI_PASSWORD" source="loki.password"/>
+
+    <!-- Appender: CONSOLE -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] %cyan(%logger{36}) : %msg%n</pattern>
+            <charset>utf8</charset>
         </encoder>
     </appender>
 
+    <!-- Appender: FILE (Dùng cho Production) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -20,20 +31,67 @@
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>utf8</charset>
         </encoder>
     </appender>
 
+    <!-- Appender: LOKI (Đẩy log tập trung về Grafana Loki) -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL}</url>
+            <auth>
+                <username>${LOKI_USERNAME}</username>
+                <password>${LOKI_PASSWORD}</password>
+            </auth>
+        </http>
+        <format>
+            <label>
+                <!-- Dùng biến APP_NAME đã khai báo ở trên cho đồng bộ -->
+                <pattern>app=${APP_NAME},host=${HOSTNAME},level=%level</pattern>
+                <readMarkers>true</readMarkers>
+            </label>
+            <message class="com.github.loki4j.logback.JsonLayout">
+                <item>
+                    <key>level</key>
+                    <value>%level</value>
+                </item>
+                <item>
+                    <key>logger</key>
+                    <value>%logger{36}</value>
+                </item>
+                <item>
+                    <key>thread</key>
+                    <value>%thread</value>
+                </item>
+                <item>
+                    <key>message</key>
+                    <value>%message</value>
+                </item>
+                <item>
+                    <key>requestId</key>
+                    <!-- Logback MDC: Lấy X-Request-ID nếu có dùng Tracing Filter/Interceptor -->
+                    <value>%X{X-Request-ID}</value>
+                </item>
+            </message>
+        </format>
+    </appender>
+
+    <!-- PROFILE: dev, local, render -->
     <springProfile name="dev, local, render">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
+            <!-- Nếu muốn test Loki ở môi trường dev/render luôn thì bật dòng dưới nhé -->
+            <!-- <appender-ref ref="LOKI" /> -->
         </root>
         <logger name="com.uit.se356" level="DEBUG" />
     </springProfile>
 
+    <!-- PROFILE: prod -->
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE" />
+            <appender-ref ref="LOKI" /> <!-- Kích hoạt đẩy log lên Loki ở môi trường prod -->
         </root>
         <logger name="org.hibernate" level="ERROR" />
         <logger name="org.springframework" level="WARN" />

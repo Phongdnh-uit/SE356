@@ -66,7 +66,9 @@ subprojects {
     }
 
     dependencies {
+        val lokiVersion = "2.0.3"
         implementation("org.springframework.boot:spring-boot-starter-actuator")
+        implementation ("com.github.loki4j:loki-logback-appender:$lokiVersion")
         compileOnly("org.projectlombok:lombok")
         annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
         annotationProcessor("org.projectlombok:lombok")
