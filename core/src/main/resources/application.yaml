@@ -22,6 +22,11 @@ spring:
   messages:
     basename: i18n/messages # Basename cho validation message tìm
     encoding: UTF-8 # Mã hóa cho file i18n phù hợp với tiếng Việt
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
 
 # Cấu hình server
 server:
