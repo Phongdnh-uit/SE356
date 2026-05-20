@@ -18,8 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
 
 public class ImportProvinceGeoJsonHandler
     implements CommandHandler<ImportProvinceGeoJsonCommand, ImportResult> {
@@ -48,14 +50,17 @@ public class ImportProvinceGeoJsonHandler
     try (InputStream inputStream = command.file().getInputStream();
         var parser = objectMapper.createParser(inputStream)) {
 
-      // Stream tới array "features" mà không load toàn bộ file
       advanceToFeaturesArray(parser);
 
       List<JsonNode> batch = new ArrayList<>(command.batchSize());
 
-      // Đọc từng feature một, gom đủ batch thì flush
+      ObjectReader featureReader =
+          objectMapper
+              .readerFor(JsonNode.class)
+              .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+
       while (parser.nextToken() == JsonToken.START_OBJECT) {
-        JsonNode feature = objectMapper.readTree(parser);
+        JsonNode feature = featureReader.readValue(parser);
         batch.add(feature);
 
         if (batch.size() >= command.batchSize()) {
@@ -78,8 +83,8 @@ public class ImportProvinceGeoJsonHandler
     } catch (AppException e) {
       throw e;
     } catch (Exception e) {
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION, "Failed to parse GeoJSON: " + e.getMessage());
+      // Fix: Pass 'e' as the final parameter so the root cause is logged
+      throw new AppException(CommonErrorCode.UNCATEGORIZED_EXCEPTION, e);
     }
 
     return new ImportResult(imported, skipped, failed, errors);
@@ -140,8 +145,13 @@ public class ImportProvinceGeoJsonHandler
 
     // Bulk insert
     if (!toCreate.isEmpty()) {
-      provinceRepository.createAll(toCreate);
-      imported = toCreate.size();
+      try {
+        provinceRepository.createAll(toCreate);
+        imported = toCreate.size();
+      } catch (Exception ex) {
+        failed += toCreate.size();
+        errors.add("Database bulk insert failed for batch: " + ex.getMessage());
+      }
     }
 
     return new BatchResult(imported, skipped, failed);
