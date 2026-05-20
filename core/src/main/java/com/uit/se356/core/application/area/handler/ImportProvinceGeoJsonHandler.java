@@ -48,14 +48,16 @@ public class ImportProvinceGeoJsonHandler
     List<String> errors = new ArrayList<>();
 
     try (InputStream inputStream = command.file().getInputStream();
-         var parser = objectMapper.createParser(inputStream)) {
+        var parser = objectMapper.createParser(inputStream)) {
 
       advanceToFeaturesArray(parser);
 
       List<JsonNode> batch = new ArrayList<>(command.batchSize());
 
-      ObjectReader featureReader = objectMapper.readerFor(JsonNode.class)
-          .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+      ObjectReader featureReader =
+          objectMapper
+              .readerFor(JsonNode.class)
+              .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
 
       while (parser.nextToken() == JsonToken.START_OBJECT) {
         JsonNode feature = featureReader.readValue(parser);
@@ -82,10 +84,7 @@ public class ImportProvinceGeoJsonHandler
       throw e;
     } catch (Exception e) {
       // Fix: Pass 'e' as the final parameter so the root cause is logged
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION,
-          e
-      );
+      throw new AppException(CommonErrorCode.UNCATEGORIZED_EXCEPTION, e);
     }
 
     return new ImportResult(imported, skipped, failed, errors);

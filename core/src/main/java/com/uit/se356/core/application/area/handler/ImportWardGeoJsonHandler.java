@@ -55,7 +55,6 @@ public class ImportWardGeoJsonHandler
       description = "Permission to import wards from GeoJSON file",
       resource = PermissionConstant.Resource.WARD,
       action = PermissionConstant.Action.CREATE)
-
   @Override
   public ImportResult handle(ImportWardGeoJsonCommand command) {
     int imported = 0, skipped = 0, failed = 0;
@@ -65,14 +64,16 @@ public class ImportWardGeoJsonHandler
     Map<String, Optional<Province>> provinceCache = new ConcurrentHashMap<>();
 
     try (InputStream inputStream = command.file().getInputStream();
-         JsonParser parser = objectMapper.createParser(inputStream)) {
+        JsonParser parser = objectMapper.createParser(inputStream)) {
 
       advanceToFeaturesArray(parser);
 
       List<JsonNode> batch = new ArrayList<>(command.batchSize());
 
-      ObjectReader featureReader = objectMapper.readerFor(JsonNode.class)
-          .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+      ObjectReader featureReader =
+          objectMapper
+              .readerFor(JsonNode.class)
+              .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
 
       while (parser.nextToken() == JsonToken.START_OBJECT) {
         JsonNode feature = featureReader.readValue(parser);
@@ -172,7 +173,8 @@ public class ImportWardGeoJsonHandler
       } catch (Exception ex) {
         failed += toCreate.size();
         errors.add("Database bulk insert failed for batch: " + ex.getMessage());
-        return new BatchResult(0, skipped, failed); // Không có record nào import thành công trong batch này
+        return new BatchResult(
+            0, skipped, failed); // Không có record nào import thành công trong batch này
       }
     }
 
