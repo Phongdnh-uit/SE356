@@ -26,8 +26,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
 
 public class ImportWardGeoJsonHandler
     implements CommandHandler<ImportWardGeoJsonCommand, ImportResult> {
@@ -53,23 +55,27 @@ public class ImportWardGeoJsonHandler
       description = "Permission to import wards from GeoJSON file",
       resource = PermissionConstant.Resource.WARD,
       action = PermissionConstant.Action.CREATE)
+
   @Override
   public ImportResult handle(ImportWardGeoJsonCommand command) {
     int imported = 0, skipped = 0, failed = 0;
     List<String> errors = new ArrayList<>();
 
-    // Cache province lookups to minimize DB queries for wards belonging to the same province
+    // Cache province lookups to minimize DB queries
     Map<String, Optional<Province>> provinceCache = new ConcurrentHashMap<>();
 
     try (InputStream inputStream = command.file().getInputStream();
-        JsonParser parser = objectMapper.createParser(inputStream)) {
+         JsonParser parser = objectMapper.createParser(inputStream)) {
 
       advanceToFeaturesArray(parser);
 
       List<JsonNode> batch = new ArrayList<>(command.batchSize());
 
+      ObjectReader featureReader = objectMapper.readerFor(JsonNode.class)
+          .without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+
       while (parser.nextToken() == JsonToken.START_OBJECT) {
-        JsonNode feature = objectMapper.readTree(parser);
+        JsonNode feature = featureReader.readValue(parser);
         batch.add(feature);
 
         if (batch.size() >= command.batchSize()) {
@@ -92,8 +98,7 @@ public class ImportWardGeoJsonHandler
     } catch (AppException e) {
       throw e;
     } catch (Exception e) {
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION, "Failed to parse GeoJSON: " + e.getMessage());
+      throw new AppException(CommonErrorCode.UNCATEGORIZED_EXCEPTION, e);
     }
 
     return new ImportResult(imported, skipped, failed, errors);
@@ -162,7 +167,13 @@ public class ImportWardGeoJsonHandler
     }
 
     if (!toCreate.isEmpty()) {
-      wardRepository.createAll(toCreate);
+      try {
+        wardRepository.createAll(toCreate);
+      } catch (Exception ex) {
+        failed += toCreate.size();
+        errors.add("Database bulk insert failed for batch: " + ex.getMessage());
+        return new BatchResult(0, skipped, failed); // Không có record nào import thành công trong batch này
+      }
     }
 
     return new BatchResult(toCreate.size(), skipped, failed);

@@ -22,4 +22,18 @@ public class AppException extends RuntimeException {
     this.errorCode = errorCode;
     this.details = details;
   }
+
+  // 1. Constructor for just an error code and a root cause
+  public AppException(ErrorCode errorCode, Throwable cause) {
+    super(errorCode.getMessageKey(), cause);
+    this.errorCode = errorCode;
+    this.details = null;
+  }
+
+  // 2. Constructor for an error code, custom details, and a root cause
+  public AppException(ErrorCode errorCode, Object details, Throwable cause) {
+    super(errorCode.getMessageKey(), cause);
+    this.errorCode = errorCode;
+    this.details = details;
+  }
 }
