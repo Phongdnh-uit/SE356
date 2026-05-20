@@ -2,6 +2,7 @@ package com.uit.se356.core.infrastructure.persistence.repositories.authenticatio
 
 import com.uit.se356.common.repository.CommonRepository;
 import com.uit.se356.core.application.user.projections.UserSummaryProjection;
+import com.uit.se356.core.application.user.result.UserProfileResult;
 import com.uit.se356.core.domain.vo.authentication.UserStatus;
 import com.uit.se356.core.infrastructure.persistence.entities.authentication.UserJpaEntity;
 import java.util.List;
@@ -21,6 +22,51 @@ public interface UserJpaRepository extends CommonRepository<UserJpaEntity, Strin
 
   @EntityGraph(attributePaths = "role")
   Optional<UserJpaEntity> findByPhoneNumber(String phoneNumber);
+
+  @Query(
+      """
+    SELECT new com.uit.se356.core.application.user.result.UserProfileResult(
+        u.id,
+        u.fullName,
+        u.email,
+        u.phoneNumber,
+        CAST(u.status AS string),
+        r.name,
+        u.phoneVerified,
+        u.emailVerified
+    )
+    FROM UserJpaEntity u JOIN u.role r
+    WHERE u.id = :id
+  """)
+  Optional<UserProfileResult> findProfileDtoById(@Param("id") String id);
+
+  @Query(
+      """
+        SELECT new com.uit.se356.core.application.user.result.UserProfileResult(
+            u.id,
+            u.fullName,
+            u.email,
+            u.phoneNumber,
+            CAST(u.status AS string),
+            r.name,
+            u.phoneVerified,
+            u.emailVerified
+        )
+        FROM UserJpaEntity u JOIN u.role r
+        WHERE u.email = :email
+    """)
+  Optional<UserProfileResult> findProfileDtoByEmail(@Param("email") String email);
+
+  @Query(
+      """
+        SELECT new com.uit.se356.core.application.user.result.UserProfileResult(
+            u.id, u.fullName, u.email, u.phoneNumber, CAST(u.status AS string),
+            r.name, u.phoneVerified, u.emailVerified
+        )
+        FROM UserJpaEntity u JOIN u.role r
+        WHERE u.phoneNumber = :phone
+    """)
+  Optional<UserProfileResult> findProfileDtoByPhone(@Param("phone") String phone);
 
   @EntityGraph(attributePaths = "role")
   @Query("SELECT u FROM UserJpaEntity u WHERE u.status = :status")

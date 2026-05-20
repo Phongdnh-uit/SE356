@@ -19,18 +19,17 @@ public class UpdateUserStatusHandler
 
   @Override
   public UserProfileResult handle(UpdateUserStatusCommand command) {
-    // 1. Kiểm tra xem user có tồn tại không
     User user =
         userRepository
             .findById(command.userId())
             .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
-    // 2. Cập nhật status cho user (sẽ kiểm tra transition rules trong entity)
     user.updateStatus(command.status());
 
-    // 3. Lưu user vào database
-    User updatedUser = userRepository.update(user);
+    userRepository.update(user);
 
-    return UserProfileResult.fromUser(updatedUser);
+    return userRepository
+        .findProfileById(user.getId())
+        .orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
   }
 }

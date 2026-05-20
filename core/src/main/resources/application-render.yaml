@@ -173,3 +173,8 @@ application:
 
 springdoc:
   default-produces-media-type: application/json
+
+loki:
+  url: ${LOKI_URL}
+  username: ${LOKI_USERNAME}
+  password: ${LOKI_PASSWORD}
