@@ -1,6 +1,7 @@
 package com.uit.se356.core.infrastructure.persistence.entities.order;
 
 import com.uit.se356.common.entity.BaseEntity;
+import com.uit.se356.core.domain.vo.order.Dimensions;
 import com.uit.se356.core.domain.vo.order.OrderStatus;
 import com.uit.se356.core.domain.vo.order.OrderType;
 import com.uit.se356.core.infrastructure.persistence.entities.area.ProvinceJpaEntity;
@@ -9,6 +10,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
@@ -82,8 +85,9 @@ public class OrderJpaEntity extends BaseEntity<String> {
   @Column(name = "weight", nullable = false)
   private Float weight;
 
+  @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "dimensions", columnDefinition = "jsonb")
-  private String dimensions; // JSON: {length, width, height}
+  private Dimensions dimensions; // JSON: {length, width, height}
 
   @Column(name = "value_declared", precision = 19, scale = 2)
   private BigDecimal valueDeclared;

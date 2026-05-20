@@ -1,12 +1,9 @@
 package com.uit.se356.core.infrastructure.persistence.mappers.order;
 
-import com.uit.se356.common.exception.AppException;
-import com.uit.se356.common.exception.CommonErrorCode;
 import com.uit.se356.core.domain.entities.order.Order;
 import com.uit.se356.core.domain.vo.area.ProvinceId;
 import com.uit.se356.core.domain.vo.area.WardId;
 import com.uit.se356.core.domain.vo.authentication.UserId;
-import com.uit.se356.core.domain.vo.order.Dimensions;
 import com.uit.se356.core.domain.vo.order.OrderId;
 import com.uit.se356.core.infrastructure.persistence.entities.order.OrderJpaEntity;
 import org.springframework.stereotype.Component;
@@ -58,26 +55,12 @@ public class OrderPersistenceMapper {
     entity.setActualDeliveryDate(domain.getActualDeliveryDate());
     entity.setNotes(domain.getNotes());
     entity.setRejectionReason(domain.getRejectionReason());
-
-    try {
-      entity.setDimensions(objectMapper.writeValueAsString(domain.getDimensions()));
-    } catch (Exception e) {
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION, "Failed to serialize Dimensions");
-    }
+    entity.setDimensions(domain.getDimensions());
 
     return entity;
   }
 
   public Order toDomain(OrderJpaEntity entity) {
-    Dimensions dimensions;
-    try {
-      dimensions = objectMapper.readValue(entity.getDimensions(), Dimensions.class);
-    } catch (Exception e) {
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION, "Failed to deserialize Dimensions");
-    }
-
     return Order.rehydrate(
         new OrderId(entity.getId()),
         entity.getTrackingCode(),
@@ -97,7 +80,7 @@ public class OrderPersistenceMapper {
         new ProvinceId(entity.getRecipientProvinceId()),
         entity.getDescription(),
         entity.getWeight(),
-        dimensions,
+        entity.getDimensions(),
         entity.getValueDeclared(),
         entity.isFragile(),
         entity.isRequiresSignature(),
@@ -147,12 +130,6 @@ public class OrderPersistenceMapper {
     entity.setActualDeliveryDate(order.getActualDeliveryDate());
     entity.setNotes(order.getNotes());
     entity.setRejectionReason(order.getRejectionReason());
-
-    try {
-      entity.setDimensions(objectMapper.writeValueAsString(order.getDimensions()));
-    } catch (Exception e) {
-      throw new AppException(
-          CommonErrorCode.UNCATEGORIZED_EXCEPTION, "Failed to serialize Dimensions");
-    }
+    entity.setDimensions(order.getDimensions());
   }
 }
