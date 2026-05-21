@@ -42,7 +42,7 @@ public record CreateDepotCommand(String name, DepotType type, Double lat, Double
     } else if (lng < -180 || lng > 180) {
       errors.add(
           new FieldError(
-              "lat", DepotErrorCode.INVALID_COORDINATE.getMessageKey(), new Object[] {"lat"}));
+              "lng", DepotErrorCode.INVALID_COORDINATE.getMessageKey(), new Object[] {"lng"}));
     }
 
     if (!errors.isEmpty()) {

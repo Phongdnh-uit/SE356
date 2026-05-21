@@ -38,22 +38,27 @@ public class CreateDepotHandler implements CommandHandler<CreateDepotCommand, De
     List<FieldError> errors = new ArrayList<>();
     // BR: Kiểm tra khoảng cách tối thiểu với các kho hiện tại
     if (depotRepository.hasNearbyDepot(command.lat(), command.lng(), MIN_DISTANCE_KM, null)) {
+      double minDistanceMeters = MIN_DISTANCE_KM * 1000;
       errors.add(
           new FieldError(
-              String.valueOf(MIN_DISTANCE_KM),
-              "error.depot.too_close",
-              new Object[] {MIN_DISTANCE_KM}));
+              "distance",
+              DepotErrorCode.DEPOT_TOO_CLOSE.getMessageKey(),
+              new Object[] {minDistanceMeters}));
     }
     if (!errors.isEmpty()) {
-      throw new AppException(DepotErrorCode.DEPOT_TOO_CLOSE, MIN_DISTANCE_KM);
+      // pass meters as details so message and clients get consistent unit
+      throw new AppException(DepotErrorCode.DEPOT_TOO_CLOSE, MIN_DISTANCE_KM * 1000);
     }
 
     String newId = idGenerator.generate().toString();
     Coordinate coordinate = new Coordinate(command.lat(), command.lng());
 
     Depot depot = Depot.create(new DepotId(newId), command.name(), command.type(), coordinate);
-    Depot savedDepot = depotRepository.create(depot);
-
-    return DepotResult.fromEntity(savedDepot);
+    try {
+      Depot savedDepot = depotRepository.create(depot);
+      return DepotResult.fromEntity(savedDepot);
+    } catch (Exception ex) {
+      throw new AppException(DepotErrorCode.DEPOT_CREATION_FAILED, ex.getMessage());
+    }
   }
 }
