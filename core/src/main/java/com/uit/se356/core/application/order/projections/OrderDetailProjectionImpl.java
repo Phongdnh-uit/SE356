@@ -1,8 +1,10 @@
 package com.uit.se356.core.application.order.projections;
 
+import com.uit.se356.core.domain.vo.order.Dimensions;
 import com.uit.se356.core.domain.vo.order.OrderStatus;
 import com.uit.se356.core.domain.vo.order.OrderType;
 import java.math.BigDecimal;
+import java.time.Instant;
 
 public record OrderDetailProjectionImpl(
     String id,
@@ -23,7 +25,7 @@ public record OrderDetailProjectionImpl(
     String recipientProvinceId,
     String description,
     Float weight,
-    String dimensions,
+    Dimensions dimensions,
     BigDecimal valueDeclared,
     boolean fragile,
     boolean requiresSignature,
@@ -36,8 +38,8 @@ public record OrderDetailProjectionImpl(
     String actualDeliveryDate,
     String notes,
     String rejectionReason,
-    String createdAt,
-    String updatedAt)
+    Instant createdAt,
+    Instant updatedAt)
     implements OrderDetailProjection {
   @Override
   public String getId() {
@@ -130,7 +132,7 @@ public record OrderDetailProjectionImpl(
   }
 
   @Override
-  public String getDimensions() {
+  public Dimensions getDimensions() {
     return dimensions;
   }
 
@@ -195,12 +197,12 @@ public record OrderDetailProjectionImpl(
   }
 
   @Override
-  public String getCreatedAt() {
+  public Instant getCreatedAt() {
     return createdAt;
   }
 
   @Override
-  public String getUpdatedAt() {
+  public Instant getUpdatedAt() {
     return updatedAt;
   }
 }
