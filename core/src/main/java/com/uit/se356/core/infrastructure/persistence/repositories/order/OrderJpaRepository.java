@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface OrderJpaRepository extends CommonRepository<OrderJpaEntity, String> {
   Optional<OrderJpaEntity> findByTrackingCode(String trackingCode);
 
+  Optional<OrderDetailProjection> findDetailByTrackingCode(String trackingCode);
+
   boolean existsByTrackingCode(String trackingCode);
 
   Optional<OrderDetailProjection> findDetailById(String id);

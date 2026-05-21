@@ -55,18 +55,27 @@ public class OrderRepositoryImpl implements OrderRepository {
   }
 
   @Override
+  public Optional<OrderDetailProjection> findDetailByTrackingCode(String trackingCode) {
+    return orderJpaRepository.findDetailByTrackingCode(trackingCode);
+  }
+
+  @Override
   public Optional<OrderDetailProjection> findDetailById(OrderId id) {
     return orderJpaRepository.findDetailById(id.value());
   }
 
   @Override
   public PageResponse<OrderSummaryProjection> findAll(SearchPageable searchCriteria) {
-    // 1. Chuyển đổi filter sang RSQL
-    Specification<OrderJpaEntity> spec = RSQLJPASupport.toSpecification(searchCriteria.filter());
-    // 2. Tạo pageable với sort
+    Specification<OrderJpaEntity> spec = Specification.where((Specification<OrderJpaEntity>) null);
+
+    if (searchCriteria.filter() != null && !searchCriteria.filter().isBlank()) {
+      spec = RSQLJPASupport.toSpecification(searchCriteria.filter());
+    }
+
     Pageable pageable = PageableUtil.createPageable(searchCriteria);
     var page =
         orderJpaRepository.findBy(spec, q -> q.as(OrderSummaryProjection.class).page(pageable));
+
     return PageResponse.from(page);
   }
 

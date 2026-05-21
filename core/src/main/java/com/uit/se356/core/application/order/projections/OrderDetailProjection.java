@@ -1,8 +1,10 @@
 package com.uit.se356.core.application.order.projections;
 
+import com.uit.se356.core.domain.vo.order.Dimensions;
 import com.uit.se356.core.domain.vo.order.OrderStatus;
 import com.uit.se356.core.domain.vo.order.OrderType;
 import java.math.BigDecimal;
+import java.time.Instant;
 
 public interface OrderDetailProjection {
   String getId();
@@ -41,7 +43,7 @@ public interface OrderDetailProjection {
 
   Float getWeight();
 
-  String getDimensions();
+  Dimensions getDimensions();
 
   BigDecimal getValueDeclared();
 
@@ -67,7 +69,7 @@ public interface OrderDetailProjection {
 
   String getRejectionReason();
 
-  String getCreatedAt();
+  Instant getCreatedAt();
 
-  String getUpdatedAt();
+  Instant getUpdatedAt();
 }

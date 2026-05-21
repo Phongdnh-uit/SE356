@@ -17,6 +17,8 @@ public interface OrderRepository {
 
   Optional<Order> findByTrackingCode(String trackingCode);
 
+  Optional<OrderDetailProjection> findDetailByTrackingCode(String trackingCode);
+
   Optional<OrderDetailProjection> findDetailById(OrderId id);
 
   PageResponse<OrderSummaryProjection> findAll(SearchPageable pageable);

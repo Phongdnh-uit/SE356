@@ -15,6 +15,7 @@ import com.uit.se356.core.application.order.command.StartDeliveryCommand;
 import com.uit.se356.core.application.order.command.UpdateRecipientCommand;
 import com.uit.se356.core.application.order.projections.OrderDetailProjection;
 import com.uit.se356.core.application.order.projections.OrderSummaryProjection;
+import com.uit.se356.core.application.order.query.OrderByTrackingCodeQuery;
 import com.uit.se356.core.application.order.query.OrderDetailQuery;
 import com.uit.se356.core.application.order.query.OrderSummaryQuery;
 import com.uit.se356.core.application.order.result.OrderResult;
@@ -145,12 +146,11 @@ public class OrderController {
     return ResponseEntity.ok(ApiResponse.ok(result, "Orders retrieved successfully"));
   }
 
-  @Operation(summary = "Get Order by Tracking Code")
   @GetMapping("/tracking/{trackingCode}")
-  //  @PreAuthorize("hasAnyRole('MERCHANT', 'DRIVER', 'DISPATCHER', 'ADMIN')")
   public ResponseEntity<ApiResponse<OrderDetailProjection>> getOrderByTrackingCode(
       @PathVariable String trackingCode) {
-    OrderDetailProjection result = queryBus.dispatch(new OrderDetailQuery(trackingCode));
+    OrderByTrackingCodeQuery query = new OrderByTrackingCodeQuery(trackingCode);
+    OrderDetailProjection result = queryBus.dispatch(query);
 
     return ResponseEntity.ok(
         ApiResponse.ok(result, "Order retrieved successfully by tracking code"));
